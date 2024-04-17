@@ -22,7 +22,7 @@ export interface SocketProviderProps {
 }
 
 export interface SocketContextInterface {
-  sendMoveUpdate: (msg: string) => void;
+  sendMoveUpdate: (update: string) => void;
   gameState: Chess;
   setGameState: React.Dispatch<React.SetStateAction<Chess>>;
   socket: Socket | null;
@@ -32,4 +32,10 @@ export interface user {
   id: string;
   username: string;
   email: string;
+}
+
+export interface moveType {
+  from: Square;
+  to: Square;
+  promotion?: string;
 }

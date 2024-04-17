@@ -5,7 +5,7 @@ import { getUrl } from "./utils/helpers";
 
 import Protected from "./components/Protected";
 import Login from "./pages/Login";
-import Home from "./pages/Login";
+import Home from "./pages/Home";
 import Game from "./pages/Game";
 
 const router = createBrowserRouter([

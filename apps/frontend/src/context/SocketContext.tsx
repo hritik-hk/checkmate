@@ -1,7 +1,8 @@
 import { createContext, useCallback, useEffect, useState } from "react";
 import { Socket, io } from "socket.io-client";
 import { Chess } from "chess.js";
-import { makeAMove } from "../utils/helpers";
+import { moveType } from "../interfaces/common";
+import _ from "lodash";
 
 import {
   SocketContextInterface,
@@ -10,25 +11,46 @@ import {
 
 export const SocketContext = createContext<SocketContextInterface | null>(null);
 
-export const SocketProvider = ({ children }: SocketProviderProps) => {
+export const SocketContextProvider = ({ children }: SocketProviderProps) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [gameState, setGameState] = useState<Chess>(new Chess());
+
+  useEffect(() => {
+    console.log(gameState.fen());
+  }, [gameState]);
 
   //const [moveHistory, setMoveHistory] = useState<string[][]>([]);
 
   const sendMoveUpdate: SocketContextInterface["sendMoveUpdate"] = useCallback(
     (move: string) => {
-      console.log("move made", move);
+      console.log("sendMoveUpdate", move);
+      //const update = JSON.stringify(move);
       if (socket) {
-        socket.emit("move", move);
+        const gameId = localStorage.getItem("gameId");
+        socket.emit("move-update", gameId, move);
       }
     },
     [socket]
   );
 
   const onUpdateReceive = useCallback(
-    async (move: string) => {
-      makeAMove(move, gameState, setGameState);
+    (update: string) => {
+      //const move: moveType = JSON.parse(update);
+      console.log("onUpdateReceive", update);
+
+      try {
+        //const gameCopy = _.cloneDeep(gameState);
+        // console.log("gameCopy fen", gameCopy.fen());
+        // const result = gameCopy.move(move);
+
+        //console.log(result);
+
+        setGameState(new Chess(update));
+
+        //return result; // null if the move was illegal, the move object if the move was legal
+      } catch (error) {
+        console.log("error while updating move from server", error);
+      }
     },
     [gameState]
   );
@@ -41,24 +63,24 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
 
     socket.on("move-update", onUpdateReceive);
 
-    // socket.on("new-game", (gameId: string) => {
-    //   socket.emit("new-game", gameId);
-    //   localStorage.setItem("gameId", gameId);
-    // });
+    socket.on("new-game", (gameId: string) => {
+      socket.emit("new-game", gameId);
+      localStorage.setItem("gameId", gameId);
+    });
 
     return () => {
       socket.disconnect();
       socket.off("move-update", onUpdateReceive);
       setSocket(null);
     };
-  }, [socket, onUpdateReceive]);
+  }, []);
 
   useEffect(() => {
-    const privateRoomId = localStorage.getItem("privateRoomId");
+    const gameId = localStorage.getItem("gameId");
 
-    if (privateRoomId) {
+    if (gameId) {
       if (socket) {
-        socket.emit("private-chat", privateRoomId);
+        socket.emit("new-game", gameId);
       }
     }
   }, [socket]);
