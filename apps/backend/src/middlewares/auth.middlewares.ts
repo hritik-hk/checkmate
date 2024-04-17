@@ -16,7 +16,7 @@ export default async function isAuth(
     const cookies = cookie.parse(req.headers?.cookie || "");
     const token = cookies?.accessToken;
     if (token) {
-      const jwt_secret = process.env.JWT_SECRET as string;
+      const jwt_secret = process.env.ACCESS_TOKEN_SECRET as string;
       const userPayload = jwt.verify(token, jwt_secret) as payload;
 
       const user = await prisma.user.findUnique({

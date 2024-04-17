@@ -20,3 +20,9 @@ model User {
   password_salt String
   password_hash String
 }
+
+model Game {
+  id            String @id @default(uuid())
+  whitePlayerId String
+  blackPlayerId String
+}

@@ -6,6 +6,8 @@ import { Server } from "socket.io";
 import { initializeSocketIO } from "./socket/socket.js";
 
 import authRouter from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
+import gameRouter from "./routes/game.routes.js";
 import isAuth from "./middlewares/auth.middlewares.js";
 
 const PORT = process.env.PORT;
@@ -23,7 +25,7 @@ app.use(express.json());
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN,
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   },
 });
@@ -31,6 +33,8 @@ const io = new Server(server, {
 app.set("io", io);
 
 app.use("/api/auth", authRouter);
+app.use("/api/user", isAuth, userRouter);
+app.use("/api/game", isAuth, gameRouter);
 
 initializeSocketIO(io);
 

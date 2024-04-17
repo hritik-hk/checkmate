@@ -4,15 +4,33 @@ import { IRequest, ISocket } from "../interfaces/common.js";
 import cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { payload } from "../interfaces/common.js";
-import { ChatEvent } from "../constants.js";
+import { ChatEvent, GameEvent } from "../constants.js";
 
 const prisma = new PrismaClient();
 
 const mountJoinRoomEvent = (socket: ISocket) => {
   socket.on(ChatEvent.JOIN_ROOM_EVENT, (roomId) => {
-    console.log(`User joined the game room, roomId: `, roomId);
+    console.log(`User joined the chat room, roomId: `, roomId);
     socket.join(roomId);
   });
+};
+
+const mountNewGameEvent = (socket: ISocket) => {
+  socket.on(GameEvent.NEW_GAME_EVENT, (gameId) => {
+    console.log(`new game created, gameId: `, gameId);
+    socket.join(gameId);
+  });
+};
+
+const mountMoveUpdateEvent = (socket: ISocket) => {
+  socket.on(
+    GameEvent.MOVE_UPDATE_EVENT,
+    (gameId: string, moveUpdate: string) => {
+      
+      console.log(`move update`, moveUpdate);
+      socket.broadcast.to(gameId).emit(GameEvent.MOVE_UPDATE_EVENT, moveUpdate);
+    }
+  );
 };
 
 const initializeSocketIO = (io: Server): Server => {
@@ -50,6 +68,8 @@ const initializeSocketIO = (io: Server): Server => {
 
       // Common events that needs to be mounted on the initialization
       mountJoinRoomEvent(socket);
+      mountNewGameEvent(socket);
+      mountMoveUpdateEvent(socket);
 
       socket.on(ChatEvent.DISCONNECT_EVENT, () => {
         console.log("user has disconnected 🚫. userId: " + socket.user?.id);

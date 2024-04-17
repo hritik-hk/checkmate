@@ -68,7 +68,7 @@ const loginUser = async (req: IRequest, res: Response) => {
       res.status(401).json({ msg: "invalid credentials" });
     }
   } catch (err) {
-    console.log("----------------------------error----------------------", err);
+    console.log(err);
     res.sendStatus(500).json({ error: err });
   }
 };

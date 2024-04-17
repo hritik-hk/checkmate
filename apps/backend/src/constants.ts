@@ -9,3 +9,8 @@ export const ChatEvent = {
 
   SOCKET_ERROR_EVENT: "socketError",
 } as const;
+
+export const GameEvent = {
+  NEW_GAME_EVENT: "new-game",
+  MOVE_UPDATE_EVENT: "move-update",
+} as const;
