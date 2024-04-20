@@ -21,6 +21,11 @@ export default async function isAuth(
 
       const user = await prisma.user.findUnique({
         where: { id: userPayload.userId },
+        select: {
+          id: true,
+          email: true,
+          username: true,
+        },
       });
 
       if (!user) {

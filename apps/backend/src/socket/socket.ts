@@ -5,6 +5,16 @@ import cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { payload } from "../interfaces/common.js";
 import { ChatEvent, GameEvent } from "../constants.js";
+import { activeGames } from "../game/game.js";
+import { Square } from "chess.js";
+
+//to do : move to common interface exports from packages folder
+// export interface move {
+//   from: Square;
+//   to: Square;
+//   piece: string;
+//   promotion?: string;
+// }
 
 const prisma = new PrismaClient();
 
@@ -22,15 +32,17 @@ const mountNewGameEvent = (socket: ISocket) => {
   });
 };
 
-const mountMoveUpdateEvent = (socket: ISocket) => {
-  socket.on(
-    GameEvent.MOVE_UPDATE_EVENT,
-    (gameId: string, moveUpdate: string) => {
-      
-      console.log(`move update`, moveUpdate);
-      socket.broadcast.to(gameId).emit(GameEvent.MOVE_UPDATE_EVENT, moveUpdate);
-    }
-  );
+const mountMakeMoveEvent = (socket: ISocket, io: Server) => {
+  socket.on(GameEvent.MOVE_UPDATE_EVENT, (gameId: string, update: string) => {
+    const moveUpdate = JSON.parse(update);
+
+    //update the gameState by playing the move
+    const currGame = activeGames.get(gameId);
+    const move = { from: moveUpdate.from, to: moveUpdate.to };
+    currGame?.makeMove(move, moveUpdate.piece, socket?.user?.id as string);
+
+    io.in(gameId).emit(GameEvent.MOVE_UPDATE_EVENT, currGame?.gameState.fen());
+  });
 };
 
 const initializeSocketIO = (io: Server): Server => {
@@ -69,7 +81,7 @@ const initializeSocketIO = (io: Server): Server => {
       // Common events that needs to be mounted on the initialization
       mountJoinRoomEvent(socket);
       mountNewGameEvent(socket);
-      mountMoveUpdateEvent(socket);
+      mountMakeMoveEvent(socket, io);
 
       socket.on(ChatEvent.DISCONNECT_EVENT, () => {
         console.log("user has disconnected 🚫. userId: " + socket.user?.id);

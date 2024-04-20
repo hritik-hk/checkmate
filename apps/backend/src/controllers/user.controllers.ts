@@ -6,8 +6,7 @@ const prisma = new PrismaClient();
 export const fetchLoggedInUser = async (req: IRequest, res: Response) => {
   try {
     if (req.user) {
-      const { username, email } = req.user;
-      res.status(200).json({ username, email });
+      res.status(200).json(req.user);
     } else {
       throw new Error("your not authorized");
     }

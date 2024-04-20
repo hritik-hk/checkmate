@@ -3,6 +3,7 @@ import { IRequest } from "../interfaces/common.js";
 import { PrismaClient } from "@prisma/client";
 import { emitSocketEvent } from "../socket/socket.js";
 import { GameEvent } from "../constants.js";
+import { GameState, activeGames } from "../game/game.js";
 
 const prisma = new PrismaClient();
 
@@ -34,6 +35,12 @@ export const createNewGame = async (req: IRequest, res: Response) => {
         blackPlayerId: receiver.id, // assigning black to game reciever
       },
     });
+
+    //create the new game
+    const game = new GameState(newGame.whitePlayerId, newGame.blackPlayerId);
+
+    //add to active games
+    activeGames.set(newGame.id, game);
 
     // logic to emit socket event about the new game created
     emitSocketEvent(

@@ -1,8 +1,7 @@
 import { createContext, useCallback, useEffect, useState } from "react";
 import { Socket, io } from "socket.io-client";
 import { Chess } from "chess.js";
-import { moveType } from "../interfaces/common";
-import _ from "lodash";
+import { move } from "../interfaces/common";
 
 import {
   SocketContextInterface,
@@ -22,12 +21,16 @@ export const SocketContextProvider = ({ children }: SocketProviderProps) => {
   //const [moveHistory, setMoveHistory] = useState<string[][]>([]);
 
   const sendMoveUpdate: SocketContextInterface["sendMoveUpdate"] = useCallback(
-    (move: string) => {
-      console.log("sendMoveUpdate", move);
-      //const update = JSON.stringify(move);
+    (movePlayed: move) => {
+      console.log("move played: ", movePlayed);
+
       if (socket) {
-        const gameId = localStorage.getItem("gameId");
-        socket.emit("move-update", gameId, move);
+        const activeGame = localStorage.getItem("activeGame");
+        if (activeGame) {
+          const activeGameData = JSON.parse(activeGame);
+          const update = JSON.stringify(movePlayed);
+          socket.emit("move-update", activeGameData.gameId, update);
+        }
       }
     },
     [socket]
@@ -63,10 +66,16 @@ export const SocketContextProvider = ({ children }: SocketProviderProps) => {
 
     socket.on("move-update", onUpdateReceive);
 
-    socket.on("new-game", (gameId: string) => {
-      socket.emit("new-game", gameId);
-      localStorage.setItem("gameId", gameId);
-    });
+    socket.on(
+      "new-game",
+      (gameId: string, whitePlayerId: string, blackPlayerId: string) => {
+        socket.emit("new-game", gameId);
+        localStorage.setItem(
+          "activeGame",
+          JSON.stringify({ gameId, whitePlayerId, blackPlayerId })
+        );
+      }
+    );
 
     return () => {
       socket.disconnect();

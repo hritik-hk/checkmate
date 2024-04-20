@@ -16,8 +16,13 @@ export default function Home() {
     const opponentUser = await getUserByUsername(username);
     if (opponentUser) {
       const newGame = await createGame({ id: opponentUser.id });
-      socket?.emit("new-game", newGame.game.id);
-      localStorage.setItem("gameId", newGame.game.id);
+      const { id, whitePlayerId, blackPlayerId } = newGame.game;
+      socket?.emit("new-game", id);
+      localStorage.setItem(
+        "gameId",
+        JSON.stringify({ gameId: id, whitePlayerId, blackPlayerId })
+      );
+
       navigate("/newgame");
     }
   }
