@@ -29,7 +29,7 @@ export const SocketContextProvider = ({ children }: SocketProviderProps) => {
         if (activeGame) {
           const activeGameData = JSON.parse(activeGame);
           const update = JSON.stringify(movePlayed);
-          socket.emit("move-update", activeGameData.gameId, update);
+          socket.emit("move-update", activeGameData.id, update);
         }
       }
     },
@@ -37,9 +37,9 @@ export const SocketContextProvider = ({ children }: SocketProviderProps) => {
   );
 
   const onUpdateReceive = useCallback(
-    (update: string) => {
+    (updateGameState: string) => {
       //const move: moveType = JSON.parse(update);
-      console.log("onUpdateReceive", update);
+      console.log("onUpdateReceive", updateGameState);
 
       try {
         //const gameCopy = _.cloneDeep(gameState);
@@ -48,14 +48,14 @@ export const SocketContextProvider = ({ children }: SocketProviderProps) => {
 
         //console.log(result);
 
-        setGameState(new Chess(update));
+        setGameState(new Chess(updateGameState));
 
         //return result; // null if the move was illegal, the move object if the move was legal
       } catch (error) {
         console.log("error while updating move from server", error);
       }
     },
-    [gameState]
+    []
   );
 
   useEffect(() => {
@@ -66,16 +66,10 @@ export const SocketContextProvider = ({ children }: SocketProviderProps) => {
 
     socket.on("move-update", onUpdateReceive);
 
-    socket.on(
-      "new-game",
-      (gameId: string, whitePlayerId: string, blackPlayerId: string) => {
-        socket.emit("new-game", gameId);
-        localStorage.setItem(
-          "activeGame",
-          JSON.stringify({ gameId, whitePlayerId, blackPlayerId })
-        );
-      }
-    );
+    socket.on("new-game", (newGame) => {
+      socket.emit("new-game", newGame.id);
+      localStorage.setItem("activeGame", JSON.stringify(newGame));
+    });
 
     return () => {
       socket.disconnect();

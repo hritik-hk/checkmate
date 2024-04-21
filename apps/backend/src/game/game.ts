@@ -35,8 +35,12 @@ class GameState {
       (piece[0] === "b" && playerId === this._blackPlayerId) ||
       (piece[0] === "w" && playerId === this._whitePlayerId)
     ) {
-      const result = this._gameState.move(move);
-      return result; // NULL return if move is invald
+      try {
+        const result = this._gameState.move(move);
+        return result; // NULL return if move is invald
+      } catch (error) {
+        console.log("error playing move ", error);
+      }
     } else {
       //trying to play opponents pieces
       return null;

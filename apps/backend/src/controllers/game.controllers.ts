@@ -47,12 +47,10 @@ export const createNewGame = async (req: IRequest, res: Response) => {
       req,
       newGame.blackPlayerId,
       GameEvent.NEW_GAME_EVENT,
-      newGame.id
+      newGame
     );
 
-    return res
-      .status(201)
-      .json({ msg: "game created successfully", game: newGame });
+    return res.status(201).json(newGame);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error });

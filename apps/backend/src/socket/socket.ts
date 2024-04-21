@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import { payload } from "../interfaces/common.js";
 import { ChatEvent, GameEvent } from "../constants.js";
 import { activeGames } from "../game/game.js";
-import { Square } from "chess.js";
+
 
 //to do : move to common interface exports from packages folder
 // export interface move {
@@ -38,6 +38,7 @@ const mountMakeMoveEvent = (socket: ISocket, io: Server) => {
 
     //update the gameState by playing the move
     const currGame = activeGames.get(gameId);
+    console.log("curr game: ", currGame);
     const move = { from: moveUpdate.from, to: moveUpdate.to };
     currGame?.makeMove(move, moveUpdate.piece, socket?.user?.id as string);
 
@@ -102,7 +103,7 @@ const emitSocketEvent = (
   req: IRequest,
   roomId: string,
   event: string,
-  payload: string
+  payload: any
 ) => {
   req.app.get("io").in(roomId).emit(event, payload);
 };
