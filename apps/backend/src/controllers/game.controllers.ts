@@ -1,18 +1,17 @@
 import { Response } from "express";
 import { IRequest } from "../interfaces/common.js";
-import { PrismaClient } from "@prisma/client";
 import { emitSocketEvent } from "../socket/socket.js";
 import { GameEvent } from "../constants.js";
 import { GameState, activeGames } from "../game/game.js";
-
-const prisma = new PrismaClient();
+import db from "../configs/database.js";
+import { randomGame } from "../game/randomGameManager.js";
 
 export const createNewGame = async (req: IRequest, res: Response) => {
   const { recipientId } = req.params;
 
   try {
     // Check if it's a valid receiver
-    const receiver = await prisma.user.findUnique({
+    const receiver = await db.user.findUnique({
       where: { id: recipientId },
     });
 
@@ -29,7 +28,7 @@ export const createNewGame = async (req: IRequest, res: Response) => {
       throw new Error("You cannot play with yourself");
     }
 
-    const newGame = await prisma.game.create({
+    const newGame = await db.game.create({
       data: {
         whitePlayerId: req.user.id, // assigning white to the game creater for now
         blackPlayerId: receiver.id, // assigning black to game reciever
@@ -54,5 +53,20 @@ export const createNewGame = async (req: IRequest, res: Response) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error });
+  }
+};
+
+export const handleRandomGame = async (req: IRequest, res: Response) => {
+  try {
+    if (req.user) {
+      await randomGame.addUser(req, req.user);
+
+      res.status(200).json({ msg: "request successful" });
+    } else {
+      throw new Error("your not authorized!");
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err });
   }
 };

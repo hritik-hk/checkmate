@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { IRequest } from "../interfaces/common.js";
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import db from "../configs/database.js";
 
 export const fetchLoggedInUser = async (req: IRequest, res: Response) => {
   try {
@@ -19,7 +18,7 @@ export const fetchUserByUsername = async (req: Request, res: Response) => {
   const { username } = req.params;
 
   try {
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { username: username },
       select: {
         id: true,

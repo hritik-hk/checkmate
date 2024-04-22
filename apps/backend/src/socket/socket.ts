@@ -7,7 +7,6 @@ import { payload } from "../interfaces/common.js";
 import { ChatEvent, GameEvent } from "../constants.js";
 import { activeGames } from "../game/game.js";
 
-
 //to do : move to common interface exports from packages folder
 // export interface move {
 //   from: Square;
@@ -35,10 +34,9 @@ const mountNewGameEvent = (socket: ISocket) => {
 const mountMakeMoveEvent = (socket: ISocket, io: Server) => {
   socket.on(GameEvent.MOVE_UPDATE_EVENT, (gameId: string, update: string) => {
     const moveUpdate = JSON.parse(update);
-
+    
     //update the gameState by playing the move
     const currGame = activeGames.get(gameId);
-    console.log("curr game: ", currGame);
     const move = { from: moveUpdate.from, to: moveUpdate.to };
     currGame?.makeMove(move, moveUpdate.piece, socket?.user?.id as string);
 

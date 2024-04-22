@@ -17,6 +17,7 @@ model User {
   id            String @id @default(uuid())
   email         String @unique
   username      String @unique
+  rating        Int    @default(800)
   password_salt String
   password_hash String
 }

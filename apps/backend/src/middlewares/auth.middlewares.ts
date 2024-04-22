@@ -25,6 +25,7 @@ export default async function isAuth(
           id: true,
           email: true,
           username: true,
+          rating: true
         },
       });
 

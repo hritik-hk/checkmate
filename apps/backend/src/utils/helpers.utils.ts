@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { IUser, hashPasswordType, jwtResponse } from "../interfaces/common.js";
+import { hashPasswordType, jwtResponse } from "../interfaces/common.js";
 
 function genPassword(password: string): hashPasswordType {
   const salt = crypto.randomBytes(32);
@@ -24,7 +24,7 @@ function validPassword(password: string, hash: string, salt: string): boolean {
   return crypto.timingSafeEqual(hashedPassword, Buffer.from(hash, "base64"));
 }
 
-function issueJWT(user: IUser): jwtResponse {
+function issueJWT(user: { id: string }): jwtResponse {
   const expiresIn = parseInt(process.env.JWT_EXPIRY as string);
   const jwt_secret = process.env.ACCESS_TOKEN_SECRET as string;
 

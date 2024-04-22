@@ -1,5 +1,4 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
 import {
   genPassword,
   issueJWT,
@@ -7,15 +6,14 @@ import {
 } from "../utils/helpers.utils.js";
 import { IRequest } from "../interfaces/common.js";
 import cookie from "cookie";
-
-const prisma = new PrismaClient();
+import db from "../configs/database.js";
 
 //register
 const createUser = async (req: IRequest, res: Response) => {
   try {
     const { hash, salt } = genPassword(req.body.password);
 
-    const user = await prisma.user.create({
+    const user = await db.user.create({
       data: {
         email: req.body.email,
         username: req.body.username,
@@ -33,7 +31,7 @@ const loginUser = async (req: IRequest, res: Response) => {
   try {
     const { username, password } = req.body;
 
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { username: username },
     });
     if (!user) {
@@ -51,8 +49,6 @@ const loginUser = async (req: IRequest, res: Response) => {
     if (isValid) {
       const { token, expires } = issueJWT({
         id: user.id,
-        username: user.username,
-        email: user.email,
       }); //issue token
 
       const cookieOptions = {
