@@ -1,6 +1,6 @@
 import Navbar from "../components/Navbar";
 import { getUserByUsername } from "../api/user";
-import { createGame } from "../api/game";
+import { createGame, startRandomGame } from "../api/game";
 import { useSocket } from "../hooks/socket";
 import { useNavigate } from "react-router-dom";
 
@@ -21,6 +21,15 @@ export default function Home() {
       localStorage.setItem("activeGame", JSON.stringify(newGame));
 
       navigate("/newgame");
+    }
+  }
+
+  async function handleRandomGame() {
+    try {
+      await startRandomGame();
+      navigate("/newgame");
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -47,6 +56,14 @@ export default function Home() {
               </button>
             </div>
           </form>
+        </div>
+        <div className="mt-5 ml-2">
+          <button
+            className="text-white bg-green-700 hover:bg-green-500 font-medium rounded-lg text-lg px-4 py-2"
+            onClick={handleRandomGame}
+          >
+            Play with Someone online
+          </button>
         </div>
       </div>
     </>

@@ -16,3 +16,19 @@ export const createGame = async ({ id }: { id: string }) => {
     console.error(err);
   }
 };
+
+export const startRandomGame = async () => {
+  try {
+    const resp = await fetch(getUrl("game/random"), {
+      credentials: "include",
+    });
+    if (!resp.ok) {
+      throw new Error("some error occurred, try again");
+    }
+
+    const msg = await resp.json();
+    return msg;
+  } catch (err) {
+    console.log(err);
+  }
+};

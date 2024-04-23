@@ -23,7 +23,14 @@ model User {
 }
 
 model Game {
-  id            String @id @default(uuid())
+  id            String  @id @default(uuid())
   whitePlayerId String
   blackPlayerId String
+  tournamentId  String?
 }
+
+model Tournament {
+  id           String   @id @default(uuid())
+  participants String[]
+}
+
