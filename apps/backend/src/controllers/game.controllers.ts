@@ -32,6 +32,7 @@ export const createNewGame = async (req: IRequest, res: Response) => {
       data: {
         whitePlayerId: req.user.id, // assigning white to the game creater for now
         blackPlayerId: receiver.id, // assigning black to game reciever
+        status: "IN_PROGRESS",
       },
     });
 

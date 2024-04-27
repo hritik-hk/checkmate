@@ -13,24 +13,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// TO DO: Add indexing
+
 model User {
-  id            String @id @default(uuid())
-  email         String @unique
-  username      String @unique
-  rating        Int    @default(800)
+  id            String   @id @default(uuid())
+  email         String   @unique
+  username      String   @unique
+  rating        Int      @default(800)
   password_salt String
   password_hash String
+  Points        Points[]
 }
 
 model Game {
-  id            String  @id @default(uuid())
+  id            String     @id @default(uuid())
   whitePlayerId String
   blackPlayerId String
   tournamentId  String?
+  status        GameStatus
+  winnerId      String?
+  isDraw        Boolean    @default(false)
+  moves         String[] //for now let it be strings
 }
 
 model Tournament {
   id           String   @id @default(uuid())
   participants String[]
+  pointsTable  Points[]
 }
 
+model Points {
+  id           String     @id @default(uuid())
+  tournamentId String
+  userId       String
+  point        Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+}
+
+enum GameStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}

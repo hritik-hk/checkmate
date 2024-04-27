@@ -28,6 +28,7 @@ class randomGameManager {
           data: {
             whitePlayerId: whitePlayer.id,
             blackPlayerId: blackPlayer.id,
+            status: "IN_PROGRESS",
           },
         });
 
@@ -54,7 +55,6 @@ class randomGameManager {
           GameEvent.NEW_GAME_EVENT,
           newGame
         );
-        
       } catch (err) {
         console.log(err);
       }

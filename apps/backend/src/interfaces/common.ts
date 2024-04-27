@@ -29,3 +29,14 @@ export interface jwtResponse {
 export interface payload {
   userId: string;
 }
+
+export interface IGame {
+  id: string;
+  whitePlayerId: string;
+  blackPlayerId: string;
+  tournamentId: string | null;
+  status: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+  winnerId: string | null;
+  isDraw: boolean;
+  moves: string[];
+}
