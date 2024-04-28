@@ -11,6 +11,9 @@ export const ChatEvent = {
 } as const;
 
 export const GameEvent = {
-  NEW_GAME_EVENT: "new-game",
-  MOVE_UPDATE_EVENT: "move-update",
+  NEW_GAME_EVENT: "new_game",
+  START_GAME: "start_game",
+  GAME_REQUEST: "game_request",
+  INIT_GAME: "init_game",
+  MOVE_UPDATE_EVENT: "move_update",
 } as const;

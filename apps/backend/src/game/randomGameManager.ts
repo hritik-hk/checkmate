@@ -41,19 +41,19 @@ class randomGameManager {
         //add to active games
         activeGames.set(newGame.id, game);
 
-        // emit new game created to the players
+        // emit start_game socket event to both players
         emitSocketEvent(
           req,
           newGame.blackPlayerId,
-          GameEvent.NEW_GAME_EVENT,
-          newGame
+          GameEvent.INIT_GAME,
+          newGame.id
         );
 
         emitSocketEvent(
           req,
           newGame.whitePlayerId,
-          GameEvent.NEW_GAME_EVENT,
-          newGame
+          GameEvent.INIT_GAME,
+          newGame.id
         );
       } catch (err) {
         console.log(err);
@@ -62,6 +62,8 @@ class randomGameManager {
   }
 
   public async addUser(req: IRequest, user: IUser) {
+    //TO DO: handle multiple requests by same user ie. 
+    // the user shouldn't be added to queue again if it's already in the queue
     this._userQueue.enqueue(user);
     await this.handleAssignGame(req);
   }

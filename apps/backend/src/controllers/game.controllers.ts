@@ -42,12 +42,19 @@ export const createNewGame = async (req: IRequest, res: Response) => {
     //add to active games
     activeGames.set(newGame.id, game);
 
-    // logic to emit socket event about the new game created
+    // logic to emit start_game socket event to both players
     emitSocketEvent(
       req,
       newGame.blackPlayerId,
-      GameEvent.NEW_GAME_EVENT,
-      newGame
+      GameEvent.INIT_GAME,
+      newGame.id
+    );
+
+    emitSocketEvent(
+      req,
+      newGame.whitePlayerId,
+      GameEvent.INIT_GAME,
+      newGame.id
     );
 
     return res.status(201).json(newGame);

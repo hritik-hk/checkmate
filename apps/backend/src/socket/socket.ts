@@ -24,17 +24,25 @@ const mountJoinRoomEvent = (socket: ISocket) => {
   });
 };
 
-const mountNewGameEvent = (socket: ISocket) => {
-  socket.on(GameEvent.NEW_GAME_EVENT, (gameId) => {
-    console.log(`new game created, gameId: `, gameId);
+const mountGameReqEvent = (socket: ISocket, io: Server) => {
+  socket.on(GameEvent.GAME_REQUEST, (opponentId) => {
+    io.in(opponentId).emit(GameEvent.GAME_REQUEST, {
+      requestedBy: socket.user?.id,
+    });
+  });
+};
+
+const mountInitGameEvent = (socket: ISocket) => {
+  socket.on(GameEvent.INIT_GAME, (gameId: string) => {
     socket.join(gameId);
+    socket.emit(GameEvent.START_GAME, gameId);
   });
 };
 
 const mountMakeMoveEvent = (socket: ISocket, io: Server) => {
   socket.on(GameEvent.MOVE_UPDATE_EVENT, (gameId: string, update: string) => {
     const moveUpdate = JSON.parse(update);
-    
+
     //update the gameState by playing the move
     const currGame = activeGames.get(gameId);
     const move = { from: moveUpdate.from, to: moveUpdate.to };
@@ -79,8 +87,9 @@ const initializeSocketIO = (io: Server): Server => {
 
       // Common events that needs to be mounted on the initialization
       mountJoinRoomEvent(socket);
-      mountNewGameEvent(socket);
       mountMakeMoveEvent(socket, io);
+      mountGameReqEvent(socket, io);
+      mountInitGameEvent(socket);
 
       socket.on(ChatEvent.DISCONNECT_EVENT, () => {
         console.log("user has disconnected 🚫. userId: " + socket.user?.id);
@@ -89,6 +98,7 @@ const initializeSocketIO = (io: Server): Server => {
         }
       });
     } catch (error) {
+      console.log(error);
       socket.emit(
         ChatEvent.SOCKET_ERROR_EVENT,
         error || "Something went wrong while connecting to the socket."
