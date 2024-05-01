@@ -16,13 +16,14 @@ datasource db {
 // TO DO: Add indexing
 
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
-  username      String   @unique
-  rating        Int      @default(800)
+  id            String @id @default(uuid())
+  email         String @unique
+  username      String @unique
+  rating        Int    @default(800)
   password_salt String
   password_hash String
-  Points        Points[]
+  gamesAsWhite  Game[] @relation("GamesAsWhite")
+  gamesAsBlack  Game[] @relation("GamesAsBlack")
 }
 
 model Game {
@@ -34,21 +35,28 @@ model Game {
   winnerId      String?
   isDraw        Boolean    @default(false)
   moves         String[] //for now let it be strings
+  Round         Round[]
+  whitePlayer   User       @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
+  blackPlayer   User       @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
 }
 
 model Tournament {
   id           String   @id @default(uuid())
   participants String[]
-  pointsTable  Points[]
+  totalRounds  Int
+  roundsOver   Int      @default(0)
 }
 
-model Points {
-  id           String     @id @default(uuid())
+model Round {
+  roundNumber  Int
   tournamentId String
-  userId       String
-  point        Int
-  tournament   Tournament @relation(fields: [tournamentId], references: [id])
-  user         User       @relation(fields: [userId], references: [id])
+  gameId       String
+  startTime    BigInt
+  endTime      BigInt
+
+  game Game @relation(fields: [gameId], references: [id])
+
+  @@id([tournamentId, gameId])
 }
 
 enum GameStatus {

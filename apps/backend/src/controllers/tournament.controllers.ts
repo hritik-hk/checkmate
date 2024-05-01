@@ -2,10 +2,17 @@ import db from "../configs/database.js";
 import { IGame, IRequest } from "../interfaces/common.js";
 import { Response } from "express";
 import { tournament } from "../game/tournamentManager.js";
+import { createSingleRoundRobin } from "../utils/helpers.utils.js";
 
 export const createTournament = async (req: IRequest, res: Response) => {
   try {
     const participants: string[] = req.body?.participants || [];
+    const numOfRounds =
+      participants.length % 2 === 0
+        ? participants.length - 1
+        : participants.length;
+
+    const matchType = req.body?.matchType;
 
     if (participants.length < 3) {
       return res
@@ -16,44 +23,30 @@ export const createTournament = async (req: IRequest, res: Response) => {
     const newTournament = await db.tournament.create({
       data: {
         participants: participants,
+        totalRounds: numOfRounds,
       },
     });
 
     //create all tournament games - round robin format
+    const tournamentData = createSingleRoundRobin(
+      participants,
+      newTournament.id,
+      matchType
+    );
 
-    let gamesList: IGame[]= [];
+    const games = await db.game.createMany({
+      data: tournamentData.games,
+    });
 
-    for (let i = 0; i < participants.length; i++) {
-      //create points table
-      await db.points.create({
-        data: {
-          tournamentId: newTournament.id,
-          userId: participants[i] as string,
-          point: 0,
-        },
-      });
+    const tournamentRounds = await db.round.createMany({
+      data: tournamentData.allRoundGames,
+    });
 
-      for (let j = i + 1; j < participants.length; j++) {
-        //create game
-        const game = await db.game.create({
-          data: {
-            whitePlayerId: participants[i] as string,
-            blackPlayerId: participants[j] as string,
-            status: "IN_PROGRESS",
-            tournamentId: newTournament.id,
-          },
-        });
-
-        gamesList.push(game);
-      }
-    }
-
-    tournament.addGamesInTournament(newTournament.id, gamesList)
-
-    return res.status(200).json(newTournament);
+    return res
+      .status(200)
+      .json({ newTournament, tournamentRounds: tournamentData.rounds });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
   }
 };
-
