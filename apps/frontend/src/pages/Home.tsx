@@ -1,12 +1,12 @@
-import Navbar from "../components/Navbar";
 import { getUserByUsername } from "../api/user";
-import { createGame, startRandomGame } from "../api/game";
+import { startRandomGame } from "../api/game";
 import { useSocket } from "../hooks/socket";
-import { useNavigate } from "react-router-dom";
+import { GameEvent } from "../utils/constant";
+import Navbar from "@/components/Navbar";
+import { CreateTournament } from "@/components/CreateTournament";
 
 export default function Home() {
   const { socket } = useSocket();
-  const navigate = useNavigate();
 
   async function handleSearch(e: any) {
     e.preventDefault();
@@ -15,23 +15,23 @@ export default function Home() {
     const username = Object.fromEntries(formData) as { username: string };
     const opponentUser = await getUserByUsername(username);
     if (opponentUser) {
-      const newGame = await createGame({ id: opponentUser.id });
+      //const newGame = await createGame({ id: opponentUser.id });
 
-      socket?.emit("new-game", newGame.id);
-      localStorage.setItem("activeGame", JSON.stringify(newGame));
+      socket?.emit(GameEvent.GAME_REQUEST, opponentUser.id);
+      // localStorage.setItem("activeGame", JSON.stringify(newGame));
 
-      navigate("/newgame");
+      //navigate("/newgame");
     }
   }
 
   async function handleRandomGame() {
     try {
       await startRandomGame();
-      navigate("/newgame");
     } catch (err) {
       console.log(err);
     }
   }
+
 
   return (
     <>
@@ -64,6 +64,10 @@ export default function Home() {
           >
             Play with Someone online
           </button>
+        </div>
+        <CreateTournament />
+        <div className="mt-10 text-white">
+          
         </div>
       </div>
     </>

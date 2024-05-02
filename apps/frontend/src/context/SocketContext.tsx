@@ -18,7 +18,6 @@ export const SocketContextProvider = ({ children }: SocketProviderProps) => {
     console.log(gameState.fen());
   }, [gameState]);
 
-  //const [moveHistory, setMoveHistory] = useState<string[][]>([]);
 
   const sendMoveUpdate: SocketContextInterface["sendMoveUpdate"] = useCallback(
     (movePlayed: move) => {
@@ -36,27 +35,24 @@ export const SocketContextProvider = ({ children }: SocketProviderProps) => {
     [socket]
   );
 
-  const onUpdateReceive = useCallback(
-    (updateGameState: string) => {
-      //const move: moveType = JSON.parse(update);
-      console.log("onUpdateReceive", updateGameState);
+  const onUpdateReceive = useCallback((updateGameState: string) => {
+    //const move: moveType = JSON.parse(update);
+    console.log("onUpdateReceive", updateGameState);
 
-      try {
-        //const gameCopy = _.cloneDeep(gameState);
-        // console.log("gameCopy fen", gameCopy.fen());
-        // const result = gameCopy.move(move);
+    try {
+      //const gameCopy = _.cloneDeep(gameState);
+      // console.log("gameCopy fen", gameCopy.fen());
+      // const result = gameCopy.move(move);
 
-        //console.log(result);
+      //console.log(result);
 
-        setGameState(new Chess(updateGameState));
+      setGameState(new Chess(updateGameState));
 
-        //return result; // null if the move was illegal, the move object if the move was legal
-      } catch (error) {
-        console.log("error while updating move from server", error);
-      }
-    },
-    []
-  );
+      //return result; // null if the move was illegal, the move object if the move was legal
+    } catch (error) {
+      console.log("error while updating move from server", error);
+    }
+  }, []);
 
   useEffect(() => {
     const socket = io(import.meta.env.VITE_SOCKET_URI, {
