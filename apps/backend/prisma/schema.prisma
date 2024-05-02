@@ -16,47 +16,64 @@ datasource db {
 // TO DO: Add indexing
 
 model User {
-  id            String @id @default(uuid())
-  email         String @unique
-  username      String @unique
-  rating        Int    @default(800)
-  password_salt String
-  password_hash String
-  gamesAsWhite  Game[] @relation("GamesAsWhite")
-  gamesAsBlack  Game[] @relation("GamesAsBlack")
+  id                     String           @id @default(uuid())
+  email                  String           @unique
+  username               String           @unique
+  rating                 Int              @default(800)
+  password_salt          String
+  password_hash          String
+  gamesAsWhite           Game[]           @relation("GamesAsWhite")
+  gamesAsBlack           Game[]           @relation("GamesAsBlack")
+  TournamentGamesAsWhite TournamentGame[] @relation("TournamentGamesAsWhite")
+  TournamentGamesAsBlack TournamentGame[] @relation("TournamentGamesAsBlack")
 }
 
 model Game {
   id            String     @id @default(uuid())
   whitePlayerId String
   blackPlayerId String
-  tournamentId  String?
   status        GameStatus
   winnerId      String?
   isDraw        Boolean    @default(false)
   moves         String[] //for now let it be strings
-  Round         Round[]
   whitePlayer   User       @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
   blackPlayer   User       @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
 }
 
 model Tournament {
-  id           String   @id @default(uuid())
-  participants String[]
-  totalRounds  Int
-  roundsOver   Int      @default(0)
+  id              String           @id @default(uuid())
+  name            String           @unique
+  participants    String[]
+  totalRounds     Int
+  roundsOver      Int              @default(0)
+  TournamentGames TournamentGame[]
+  Rounds          Round[]
+}
+
+model TournamentGame {
+  id            String     @id @default(uuid())
+  whitePlayerId String
+  blackPlayerId String
+  tournamentId  String
+  status        GameStatus
+  winnerId      String?
+  isDraw        Boolean    @default(false)
+  moves         String[] //for now let it be strings
+  roundId       String
+  tournament    Tournament @relation(fields: [tournamentId], references: [id])
+  round         Round      @relation(fields: [roundId], references: [id])
+  whitePlayer   User       @relation("TournamentGamesAsWhite", fields: [whitePlayerId], references: [id])
+  blackPlayer   User       @relation("TournamentGamesAsBlack", fields: [blackPlayerId], references: [id])
 }
 
 model Round {
-  roundNumber  Int
-  tournamentId String
-  gameId       String
-  startTime    BigInt
-  endTime      BigInt
-
-  game Game @relation(fields: [gameId], references: [id])
-
-  @@id([tournamentId, gameId])
+  id             String           @id @default(uuid())
+  roundNumber    Int
+  tournamentId   String
+  startTime      BigInt
+  endTime        BigInt
+  TournamentGame TournamentGame[]
+  tournament     Tournament       @relation(fields: [tournamentId], references: [id])
 }
 
 enum GameStatus {
