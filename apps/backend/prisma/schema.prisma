@@ -70,6 +70,7 @@ model Round {
   id             String           @id @default(uuid())
   roundNumber    Int
   tournamentId   String
+  bye            String?
   startTime      BigInt
   endTime        BigInt
   TournamentGame TournamentGame[]

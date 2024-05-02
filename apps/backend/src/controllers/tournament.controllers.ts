@@ -7,6 +7,7 @@ import { createSingleRoundRobin } from "../utils/helpers.utils.js";
 export const createTournament = async (req: IRequest, res: Response) => {
   try {
     const participants: string[] = req.body?.participants || [];
+    const name = req.body.name;
     const numOfRounds =
       participants.length % 2 === 0
         ? participants.length - 1
@@ -22,6 +23,7 @@ export const createTournament = async (req: IRequest, res: Response) => {
 
     const newTournament = await db.tournament.create({
       data: {
+        name: name,
         participants: participants,
         totalRounds: numOfRounds,
       },
@@ -34,19 +36,18 @@ export const createTournament = async (req: IRequest, res: Response) => {
       matchType
     );
 
-    const games = await db.game.createMany({
-      data: tournamentData.games,
+    const tournamentGames = await db.tournamentGame.createMany({
+      data: tournamentData.tournamentGames,
     });
 
-    const tournamentRounds = await db.round.createMany({
-      data: tournamentData.allRoundGames,
+    const rounds = await db.round.createMany({
+      data: tournamentData.rounds,
     });
 
-    return res
-      .status(200)
-      .json({ newTournament, tournamentRounds: tournamentData.rounds });
+    return res.status(200).json({ newTournament, tournamentGames, rounds });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
   }
 };
+

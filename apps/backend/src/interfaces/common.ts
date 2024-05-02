@@ -40,3 +40,12 @@ export interface IGame {
   isDraw: boolean;
   moves: string[];
 }
+
+export interface IRound {
+  id: string;
+  roundNumber: number;
+  tournamentId: string;
+  bye?: string;
+  startTime: any;
+  endTime: any;
+}
