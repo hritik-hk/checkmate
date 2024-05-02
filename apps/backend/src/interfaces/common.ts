@@ -3,9 +3,10 @@ import { Request } from "express";
 
 export interface IUser {
   id: string;
-  username: string;
   email: string;
-  rating: number;
+  username: string;
+  blitz_rating: Number;
+  rapid_rating: Number;
 }
 
 export interface ISocket extends Socket {

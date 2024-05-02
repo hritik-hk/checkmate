@@ -48,7 +48,4 @@ class GameState {
   }
 }
 
-// this will contain currently active games
-const activeGames: Map<string, GameState> = new Map<string, GameState>();
-
-export { GameState, activeGames };
+export { GameState };

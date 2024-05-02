@@ -1,4 +1,4 @@
-export const ChatEvent = {
+export const SocketEvent = {
   CONNECTED_EVENT: "connected",
 
   DISCONNECT_EVENT: "disconnect",

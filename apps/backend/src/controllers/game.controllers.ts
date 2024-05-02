@@ -5,11 +5,13 @@ import { GameEvent } from "../constants.js";
 import { GameState, activeGames } from "../game/game.js";
 import db from "../configs/database.js";
 import { randomGame } from "../game/randomGameManager.js";
+import { GameStatus, GameType } from "@prisma/client";
 
 export const createNewGame = async (req: IRequest, res: Response) => {
-  const { recipientId } = req.params;
-
   try {
+    const recipientId = req.body.recipientId;
+    const gameType: GameType = req.body.gameType;
+
     // Check if it's a valid receiver
     const receiver = await db.user.findUnique({
       where: { id: recipientId },
@@ -32,7 +34,8 @@ export const createNewGame = async (req: IRequest, res: Response) => {
       data: {
         whitePlayerId: req.user.id, // assigning white to the game creater for now
         blackPlayerId: receiver.id, // assigning black to game reciever
-        status: "IN_PROGRESS",
+        status: GameStatus.IN_PROGRESS,
+        gameType: gameType,
       },
     });
 

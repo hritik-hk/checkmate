@@ -19,9 +19,13 @@ model User {
   id                     String           @id @default(uuid())
   email                  String           @unique
   username               String           @unique
-  rating                 Int              @default(800)
+  blitz_rating           Int              @default(800)
+  rapid_rating           Int              @default(800)
   password_salt          String
   password_hash          String
+  createdAt              DateTime         @default(now())
+  friends                User[]           @relation("friends")
+  friendsRelation        User[]           @relation("friends")
   gamesAsWhite           Game[]           @relation("GamesAsWhite")
   gamesAsBlack           Game[]           @relation("GamesAsBlack")
   TournamentGamesAsWhite TournamentGame[] @relation("TournamentGamesAsWhite")
@@ -33,6 +37,7 @@ model Game {
   whitePlayerId String
   blackPlayerId String
   status        GameStatus
+  gameType      GameType
   winnerId      String?
   isDraw        Boolean    @default(false)
   moves         String[] //for now let it be strings
@@ -56,6 +61,7 @@ model TournamentGame {
   blackPlayerId String
   tournamentId  String
   status        GameStatus
+  gameType      GameType
   winnerId      String?
   isDraw        Boolean    @default(false)
   moves         String[] //for now let it be strings
@@ -81,4 +87,9 @@ enum GameStatus {
   IN_PROGRESS
   COMPLETED
   ABANDONED
+}
+
+enum GameType {
+  RAPID
+  BLITZ
 }

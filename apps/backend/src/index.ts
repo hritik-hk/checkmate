@@ -2,8 +2,8 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import cors from "cors";
-import { Server } from "socket.io";
-import { initializeSocketIO } from "./socket/socket.js";
+import SocketService from "./socket/socketService.js";
+import { GameState } from "./game/game.js";
 
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
@@ -14,6 +14,7 @@ const PORT = process.env.PORT;
 
 const app = express();
 const server = createServer(app);
+const activeGames: Map<string, GameState> = new Map<string, GameState>(); //will contain currently active games
 
 app.use(
   cors({
@@ -23,21 +24,22 @@ app.use(
 );
 app.use(express.json());
 
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
-  },
-});
+const socketServer = new SocketService();
 
-app.set("io", io);
+socketServer.io.attach(server);
+
+const emitSocketEvent = (roomId: string, event: string, payload: any) => {
+  socketServer.io.in(roomId).emit(event, payload);
+};
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", isAuth, userRouter);
 app.use("/api/game", isAuth, gameRouter);
 
-initializeSocketIO(io);
+socketServer.initializeSocketService();
 
 server.listen(PORT, () => {
   console.log(`server listening on PORT: ${PORT}`);
 });
+
+export { socketServer, activeGames, emitSocketEvent };

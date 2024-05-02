@@ -5,6 +5,6 @@ import {
 } from "../controllers/game.controllers.js";
 const router = express.Router();
 
-router.get("/new/:recipientId", createNewGame).get("/random", handleRandomGame);
+router.get("/new", createNewGame).get("/random", handleRandomGame);
 
 export default router;
