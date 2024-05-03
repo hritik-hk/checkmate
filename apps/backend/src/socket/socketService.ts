@@ -42,7 +42,7 @@ export default class SocketService {
       //update the gameState by playing the move
       const currGame = activeGames.get(gameId);
       const move = { from: moveUpdate.from, to: moveUpdate.to };
-      currGame?.makeMove(move, moveUpdate.piece, socket?.user?.id as string);
+      currGame?.makeMove(move, socket?.user?.id as string);
 
       io.in(gameId).emit(
         GameEvent.MOVE_UPDATE_EVENT,

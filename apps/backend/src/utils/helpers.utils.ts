@@ -4,6 +4,7 @@ import { hashPasswordType, jwtResponse } from "../interfaces/common.js";
 import { GameStatus } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import { IRound } from "../interfaces/common.js";
+import { Chess, Square, Piece } from "chess.js";
 
 function genPassword(password: string): hashPasswordType {
   const salt = crypto.randomBytes(32);
@@ -115,4 +116,36 @@ function createSingleRoundRobin(
   };
 }
 
-export { issueJWT, genPassword, validPassword, createSingleRoundRobin };
+// for checking if pawn could be promoted
+const checkPromotion = (chess: Chess, from: Square, to: Square) => {
+  if (!from) {
+    return false;
+  }
+
+  const piece = chess.get(from);
+
+  if (piece?.type !== "p") {
+    return false;
+  }
+
+  if (piece.color !== chess.turn()) {
+    return false;
+  }
+
+  if (!["1", "8"].some((it) => to.endsWith(it))) {
+    return false;
+  }
+
+  return chess
+    .moves({ square: from, verbose: true })
+    .map((it) => it.to)
+    .includes(to);
+};
+
+export {
+  issueJWT,
+  genPassword,
+  validPassword,
+  createSingleRoundRobin,
+  checkPromotion,
+};
