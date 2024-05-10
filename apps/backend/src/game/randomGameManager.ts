@@ -4,8 +4,8 @@ import db from "../configs/database.js";
 import { emitSocketEvent } from "../index.js";
 import { GameState } from "./game.js";
 import { GameEvent } from "../constants.js";
-import { activeGames } from "../index.js";
 import { GameType, GameStatus } from "@prisma/client";
+import { gamesHandler } from "../index.js";
 
 const compareBlitz: ICompare<IUser> = (user1: IUser, user2: IUser) => {
   // with highest rating
@@ -43,14 +43,8 @@ class randomGameManager {
           },
         });
 
-        //create the new game
-        const game = new GameState(
-          newGame.whitePlayerId,
-          newGame.blackPlayerId
-        );
-
         //add to active games
-        activeGames.set(newGame.id, game);
+        gamesHandler.addGame(newGame);
 
         // emit start_game socket event to both players
         emitSocketEvent(newGame.blackPlayerId, GameEvent.INIT_GAME, newGame.id);
@@ -79,14 +73,8 @@ class randomGameManager {
           },
         });
 
-        //create the new game
-        const game = new GameState(
-          newGame.whitePlayerId,
-          newGame.blackPlayerId
-        );
-
         //add to active games
-        activeGames.set(newGame.id, game);
+        gamesHandler.addGame(newGame);
 
         // emit start_game socket event to both players
         emitSocketEvent(newGame.blackPlayerId, GameEvent.INIT_GAME, newGame.id);

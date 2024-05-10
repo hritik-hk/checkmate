@@ -1,24 +1,20 @@
-import { IGame, IRequest } from "../interfaces/common.js";
-import { emitSocketEvent } from "../socket/socket.js";
-import { activeGames, GameState } from "./game.js";
+import { ITournamentGame } from "../interfaces/common.js";
 import { GameEvent } from "../constants.js";
+import { emitSocketEvent } from "../index.js";
+import { gamesHandler } from "../index.js";
 
 class tournamentManager {
-  private remainingGames: Map<string, IGame[]>;
-  private onGoingGames: Map<string, Map<string, IGame>>;
+  private remainingGames: Map<string, ITournamentGame[]>;
+  private onGoingGames: Map<string, Map<string, ITournamentGame>>;
   private waitingList: Array<string>;
 
   constructor() {
-    this.remainingGames = new Map<string, IGame[]>();
-    this.onGoingGames = new Map<string, Map<string, IGame>>();
+    this.remainingGames = new Map<string, ITournamentGame[]>();
+    this.onGoingGames = new Map<string, Map<string, ITournamentGame>>();
     this.waitingList = new Array<string>();
   }
 
-  public async handleGameRequest(
-    req: IRequest,
-    tournamentId: string,
-    userId: string
-  ) {
+  public async handleGameRequest(tournamentId: string, userId: string) {
     this.waitingList.push(userId);
 
     const rem = this.remainingGames.get(tournamentId);
@@ -37,25 +33,17 @@ class tournamentManager {
             ) {
               this.onGoingGames.get(tournamentId)?.set(game.id, game);
 
-              //create the new game
-              const newGame = new GameState(
-                game.whitePlayerId,
-                game.blackPlayerId
-              );
-
-              //add to active games
-              activeGames.set(game.id, newGame);
+              //create and add new tournament game
+              gamesHandler.addGame(game);
 
               // emit new game created to the players
               emitSocketEvent(
-                req,
                 game.blackPlayerId,
                 GameEvent.NEW_GAME_EVENT,
                 game
               );
 
               emitSocketEvent(
-                req,
                 game.whitePlayerId,
                 GameEvent.NEW_GAME_EVENT,
                 game
@@ -67,14 +55,17 @@ class tournamentManager {
             }
           });
 
-          this.remainingGames.set(tournamentId, updatedRem as IGame[]);
+          this.remainingGames.set(
+            tournamentId,
+            updatedRem as ITournamentGame[]
+          );
         }
       }
     }
   }
 
   // add remaining games
-  public addGamesInTournament(tournamentId: string, games: IGame[]) {
+  public addGamesInTournament(tournamentId: string, games: ITournamentGame[]) {
     this.remainingGames.set(tournamentId, games);
   }
 }

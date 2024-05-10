@@ -13,7 +13,8 @@ export const createTournament = async (req: IRequest, res: Response) => {
         ? participants.length - 1
         : participants.length;
 
-    const matchType = req.body?.matchType;
+    const gameType = req.body?.gameType;
+    const gameDuration = req.body.gameDuration;
 
     if (participants.length < 3) {
       return res
@@ -33,7 +34,8 @@ export const createTournament = async (req: IRequest, res: Response) => {
     const tournamentData = createSingleRoundRobin(
       participants,
       newTournament.id,
-      matchType
+      gameType,
+      gameDuration
     );
 
     const tournamentGames = await db.tournamentGame.createMany({
@@ -50,4 +52,3 @@ export const createTournament = async (req: IRequest, res: Response) => {
     res.status(500).json(err);
   }
 };
-

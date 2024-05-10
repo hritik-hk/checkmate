@@ -5,6 +5,7 @@ import { GameStatus } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import { IRound } from "../interfaces/common.js";
 import { Chess, Square, Piece } from "chess.js";
+import { GameType } from "@prisma/client";
 
 function genPassword(password: string): hashPasswordType {
   const salt = crypto.randomBytes(32);
@@ -49,7 +50,8 @@ function issueJWT(user: { id: string }): jwtResponse {
 function createSingleRoundRobin(
   participants: string[],
   tournamentId: string,
-  matchType: string
+  gameType: GameType,
+  gameDuration: number
 ) {
   let numPlayers = participants.length;
   const rounds = []; // to store each round data
@@ -64,7 +66,7 @@ function createSingleRoundRobin(
   const numRounds = numPlayers - 1; // num of rounds
   const halfNumPlayers = numPlayers / 2;
   const breakBtwRounds = 120000; // 2 min
-  const matchDuration = matchType === "BLITZ" ? 360000 : 600000; // 6min or 10min
+  const rounDuration = gameDuration * 2;
 
   const playerIndexes = Array.from({ length: numPlayers }, (_, i) => i);
 
@@ -79,8 +81,8 @@ function createSingleRoundRobin(
       roundNumber: round,
       tournamentId,
       startTime:
-        Date.now() + round * breakBtwRounds + (round - 1) * matchDuration,
-      endTime: Date.now() + round * (breakBtwRounds + matchDuration),
+        Date.now() + round * breakBtwRounds + (round - 1) * rounDuration,
+      endTime: Date.now() + round * (breakBtwRounds + rounDuration),
     };
 
     for (let i = 0; i < halfNumPlayers; i++) {
@@ -93,6 +95,8 @@ function createSingleRoundRobin(
           blackPlayerId: player2 as string,
           tournamentId,
           status: GameStatus.IN_PROGRESS,
+          gameType,
+          gameDuration,
           roundId: roundId,
         };
 
