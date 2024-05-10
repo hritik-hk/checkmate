@@ -1,41 +1,39 @@
 import { Chessboard } from "react-chessboard";
 import { Square } from "react-chessboard/dist/chessboard/types";
-import { useSocket } from "../hooks/socket";
-import { useAuth } from "../hooks/auth";
-import { activeGame } from "../interfaces/common";
+import { boardProps } from "../interfaces/common";
+import { useSocket } from "@/hooks/socket";
+import { GameEvent } from "@/utils/constant";
+import { moveType } from "../interfaces/common";
 
-export default function Board() {
-  const { authUser } = useAuth();
-  const { sendMoveUpdate, gameState } = useSocket();
-  const activeGameExits = localStorage.getItem("activeGame");
-  let activeGame: activeGame | null = null;
-  if (activeGameExits) {
-    activeGame = JSON.parse(activeGameExits);
+export default function Board({
+  gameId,
+  gameState,
+  boardOrientation,
+}: boardProps) {
+  const { socket } = useSocket();
+
+  function sendMoveUpdate(move: moveType) {
+    socket?.emit(GameEvent.MOVE_UPDATE_EVENT, gameId, move);
   }
 
-  // function makeAMove(move: move) {
-  //   // console.log(game.ascii());
-  //   // const gameCopy = _.cloneDeep(gameState);
-  //   // const result = gameCopy.move(move);
-  //   //setGameState(gameCopy);
+  function makeAMove(move: moveType) {
+    //check if player is trying to move opponent's chess pieces
+    if (gameState.turn() === "w" && boardOrientation === "black") {
+      return null;
+    }
 
-  //   sendMoveUpdate(move);
+    if (gameState.turn() === "b" && boardOrientation === "white") {
+      return null;
+    }
 
-  //   console.log("after you made move", gameCopy.ascii());
-  //   return result; // null if the move was illegal, the move object if the move was legal
-  // }
+    //play move
+    const result = gameState.move({
+      from: move.from,
+      to: move.to,
+    });
 
-  // function makeRandomMove() {
-  //   const possibleMoves = game.moves();
-  //   console.log("fen", game.fen());
-  //   console.log("possible moves", possibleMoves);
-  //   if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0) {
-  //     console.log("game over");
-  //     return; // exit if the game is over
-  //   }
-  //   const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-  //   makeAMove(possibleMoves[randomIndex]);
-  // }
+    return result; // null if the move was illegal, the move object if the move was legal
+  }
 
   function onDrop(sourceSquare: Square, targetSquare: Square, piece: string) {
     console.log({ sourceSquare, targetSquare, piece });
@@ -43,27 +41,18 @@ export default function Board() {
     const move = {
       from: sourceSquare,
       to: targetSquare,
-      piece,
       //promotion: "q", // always promote to a queen for example simplicity
     };
 
     sendMoveUpdate(move);
+    const result = makeAMove(move);
 
-    // illegal move
-    // if (move === null) {
-    //   return false;
-    //}
-    // } else {
-    //   sendMoveUpdate({
-    //     from: sourceSquare,
-    //     to: targetSquare,
-    //     //promotion: "q", // always promote to a queen for example simplicity
-    //   });
-    // }
+    //illegal move
+    if (result === null) {
+      return false;
+    }
 
-    // console.log(game.ascii());
-
-    return false;
+    return true;
   }
 
   return (
@@ -71,9 +60,7 @@ export default function Board() {
       position={gameState.fen()}
       arePremovesAllowed={true}
       autoPromoteToQueen={true}
-      boardOrientation={
-        authUser?.id === activeGame?.whitePlayerId ? "white" : "black"
-      }
+      boardOrientation={boardOrientation}
       clearPremovesOnRightClick={true}
       onPieceDrop={onDrop}
     />

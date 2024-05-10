@@ -6,11 +6,15 @@ import { GameEvent } from "./utils/constant";
 import { createGame } from "./api/game";
 import { useNavigate } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
+import { useGame } from "./hooks/game";
+import { gameInfoInterface } from "./interfaces/common";
+import { Chess } from "chess.js";
 
 function App() {
   const { isLoggedIn, setIsLoggedIn, setAuthUser } = useAuth();
   const { socket } = useSocket();
   const navigate = useNavigate();
+  const { setCurrGameInfo, setGameState } = useGame();
 
   //TO DO : allow user to accept or decline incoming game request
   const handleGameRequest = async (request: any) => {
@@ -30,6 +34,11 @@ function App() {
 
   const handleStartGame = (gameId: string) => {
     navigate(`/game/${gameId}`);
+  };
+
+  const handleJoinGame = (gameInfo: gameInfoInterface) => {
+    setCurrGameInfo(gameInfo);
+    setGameState(new Chess(gameInfo.boardStatus));
   };
 
   useEffect(() => {
@@ -82,12 +91,14 @@ function App() {
     socket.on(GameEvent.GAME_REQUEST, handleGameRequest);
     socket.on(GameEvent.START_GAME, handleStartGame);
     socket.on(GameEvent.INIT_GAME, handleInitGame);
+    socket.on(GameEvent.JOIN_GAME, handleJoinGame);
 
     //remove all the event listeners  -imp clean-up function
     return () => {
       socket.off(GameEvent.GAME_REQUEST, handleGameRequest);
       socket.off(GameEvent.START_GAME, handleStartGame);
       socket.off(GameEvent.INIT_GAME, handleInitGame);
+      socket.off(GameEvent.JOIN_GAME, handleJoinGame);
     };
   }, [socket]);
 

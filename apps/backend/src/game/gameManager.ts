@@ -26,7 +26,10 @@ class gameManager {
     const game = this.activeGames.get(gameId);
 
     const gameInfo = {
+      gameId,
       boardStatus: game?.gameState.fen(),
+      whitePlayer: game?.whitePlayer,
+      blackPlayer: game?.blackPlayer,
       timeUsedByWhitePlayer: game?.getWhitePlayerTimeConsumed,
       timeUsedByBlackPlayer: game?.getBlackPlayerTimeConsumed,
       gameDuration: game?.gameDuration,

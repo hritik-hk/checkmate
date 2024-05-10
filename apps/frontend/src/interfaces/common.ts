@@ -2,6 +2,7 @@ import { Dispatch, ReactNode } from "react";
 import { Socket } from "socket.io-client";
 import { Chess } from "chess.js";
 import { Square } from "chess.js";
+import { BoardOrientation } from "react-chessboard/dist/chessboard/types";
 
 export interface authUserType {
   id: string;
@@ -9,6 +10,16 @@ export interface authUserType {
   email: string;
   firstName?: string;
   lastName?: string;
+}
+
+export interface gameInfoInterface {
+  gameId: string;
+  boardStatus: string;
+  whitePlayer: string;
+  blackPlayer: string;
+  timeUsedByWhitePlayer: number;
+  timeUsedByBlackPlayer: number;
+  gameDuration: number;
 }
 
 export interface AuthContextInterface {
@@ -23,10 +34,14 @@ export interface SocketProviderProps {
 }
 
 export interface SocketContextInterface {
-  sendMoveUpdate: (movePlayed: move) => void;
-  gameState: Chess;
-  setGameState: React.Dispatch<React.SetStateAction<Chess>>;
   socket: Socket | null;
+}
+
+export interface GameContextInterface {
+  currGameInfo: gameInfoInterface | null;
+  setCurrGameInfo: Dispatch<React.SetStateAction<gameInfoInterface | null>>;
+  gameState: Chess | null;
+  setGameState: React.Dispatch<React.SetStateAction<Chess | null>>;
 }
 
 export interface user {
@@ -35,15 +50,14 @@ export interface user {
   email: string;
 }
 
-export interface move {
+export interface moveType {
   from: Square;
   to: Square;
-  piece: string;
   promotion?: string;
 }
 
-export interface activeGame {
+export interface boardProps {
   gameId: string;
-  whitePlayerId: string;
-  blackPlayerId: string;
+  gameState: Chess;
+  boardOrientation: BoardOrientation;
 }

@@ -4,6 +4,7 @@ import { useSocket } from "../hooks/socket";
 import { GameEvent } from "../utils/constant";
 import Navbar from "@/components/Navbar";
 import { CreateTournament } from "@/components/CreateTournament";
+import CountDown from "@/components/CountDown";
 
 export default function Home() {
   const { socket } = useSocket();
@@ -32,11 +33,10 @@ export default function Home() {
     }
   }
 
-
   return (
     <>
       <Navbar />
-      <div className=" w-screen h-screen bg-slate-600 ">
+      <div className=" w-screen h-screen bg-stone-700 ">
         <div className=" w-1/2  pt-5">
           <h1 className="text-3xl text-gray-200">Find People to DM</h1>
           <form onSubmit={handleSearch}>
@@ -67,7 +67,7 @@ export default function Home() {
         </div>
         <CreateTournament />
         <div className="mt-10 text-white">
-          
+          <CountDown />
         </div>
       </div>
     </>
