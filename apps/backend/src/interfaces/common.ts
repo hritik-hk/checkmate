@@ -1,5 +1,6 @@
 import { Socket } from "socket.io";
 import { Request } from "express";
+import { GameStatus, GameType } from "@prisma/client";
 
 export interface IUser {
   id: string;
@@ -35,11 +36,26 @@ export interface IGame {
   id: string;
   whitePlayerId: string;
   blackPlayerId: string;
-  tournamentId: string | null;
-  status: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+  status: GameStatus;
+  gameType: GameType;
+  gameDuration: number;
   winnerId: string | null;
   isDraw: boolean;
   moves: string[];
+}
+
+export interface ITournamentGame {
+  id: string;
+  whitePlayerId: string;
+  blackPlayerId: string;
+  tournamentId: string;
+  status: GameStatus;
+  gameType: GameType;
+  gameDuration: number;
+  winnerId: string | null;
+  isDraw: boolean;
+  moves: string[];
+  roundId: string;
 }
 
 export interface IRound {

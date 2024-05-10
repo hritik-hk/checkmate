@@ -38,6 +38,7 @@ model Game {
   blackPlayerId String
   status        GameStatus
   gameType      GameType
+  gameDuration  Int
   winnerId      String?
   isDraw        Boolean    @default(false)
   moves         String[] //for now let it be strings
@@ -62,6 +63,7 @@ model TournamentGame {
   tournamentId  String
   status        GameStatus
   gameType      GameType
+  gameDuration  Int
   winnerId      String?
   isDraw        Boolean    @default(false)
   moves         String[] //for now let it be strings

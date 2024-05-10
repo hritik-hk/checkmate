@@ -1,16 +1,17 @@
 import { Response } from "express";
 import { IRequest } from "../interfaces/common.js";
-import { emitSocketEvent } from "../socket/socket.js";
+import { emitSocketEvent } from "../index.js";
 import { GameEvent } from "../constants.js";
-import { GameState, activeGames } from "../game/game.js";
 import db from "../configs/database.js";
 import { randomGame } from "../game/randomGameManager.js";
 import { GameStatus, GameType } from "@prisma/client";
+import { gamesHandler } from "../index.js";
 
 export const createNewGame = async (req: IRequest, res: Response) => {
   try {
     const recipientId = req.body.recipientId;
     const gameType: GameType = req.body.gameType;
+    const gameDuration = req.body.gameDuration;
 
     // Check if it's a valid receiver
     const receiver = await db.user.findUnique({
@@ -36,29 +37,17 @@ export const createNewGame = async (req: IRequest, res: Response) => {
         blackPlayerId: receiver.id, // assigning black to game reciever
         status: GameStatus.IN_PROGRESS,
         gameType: gameType,
+        gameDuration: gameDuration,
       },
     });
 
-    //create the new game
-    const game = new GameState(newGame.whitePlayerId, newGame.blackPlayerId);
-
     //add to active games
-    activeGames.set(newGame.id, game);
+    gamesHandler.addGame(newGame);
 
     // logic to emit start_game socket event to both players
-    emitSocketEvent(
-      req,
-      newGame.blackPlayerId,
-      GameEvent.INIT_GAME,
-      newGame.id
-    );
+    emitSocketEvent(newGame.blackPlayerId, GameEvent.INIT_GAME, newGame.id);
 
-    emitSocketEvent(
-      req,
-      newGame.whitePlayerId,
-      GameEvent.INIT_GAME,
-      newGame.id
-    );
+    emitSocketEvent(newGame.whitePlayerId, GameEvent.INIT_GAME, newGame.id);
 
     return res.status(201).json(newGame);
   } catch (error) {
@@ -70,8 +59,7 @@ export const createNewGame = async (req: IRequest, res: Response) => {
 export const handleRandomGame = async (req: IRequest, res: Response) => {
   try {
     if (req.user) {
-      await randomGame.addUser(req, req.user);
-
+      await randomGame.addPlayer(req, req.user);
       res.status(200).json({ msg: "request successful" });
     } else {
       throw new Error("your not authorized!");

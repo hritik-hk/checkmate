@@ -5,7 +5,7 @@ import db from "../configs/database.js";
 import jwt from "jsonwebtoken";
 import { payload } from "../interfaces/common.js";
 import { GameEvent, SocketEvent } from "../constants.js";
-import { activeGames } from "../index.js";
+import { gamesHandler } from "../index.js";
 
 export default class SocketService {
   private _io: Server;
@@ -35,12 +35,19 @@ export default class SocketService {
     });
   }
 
+  private mountJoinGameEvent(socket: ISocket) {
+    socket.on(GameEvent.JOIN_GAME, (gameId: string) => {
+      const gameInfo = gamesHandler.getGameInfo(gameId);
+      socket.emit(GameEvent.JOIN_GAME, gameInfo);
+    });
+  }
+
   private mountMakeMoveEvent(socket: ISocket, io: Server) {
     socket.on(GameEvent.MOVE_UPDATE_EVENT, (gameId: string, update: string) => {
       const moveUpdate = JSON.parse(update);
 
       //update the gameState by playing the move
-      const currGame = activeGames.get(gameId);
+      const currGame = gamesHandler.getGame(gameId);
       const move = { from: moveUpdate.from, to: moveUpdate.to };
       currGame?.makeMove(move, socket?.user?.id as string);
 
@@ -105,6 +112,7 @@ export default class SocketService {
         this.mountMakeMoveEvent(socket, io);
         this.mountGameReqEvent(socket, io);
         this.mountInitGameEvent(socket);
+        this.mountJoinGameEvent(socket);
 
         socket.on(SocketEvent.DISCONNECT_EVENT, () => {
           console.log("user has disconnected 🚫. userId: " + socket.user?.id);

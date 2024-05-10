@@ -18,8 +18,13 @@ class GameState {
   private _blackPlayerTime: number; // time used up by black player
   private _lastMoveTime: number; // for calculating used up time and to maintain time remaining
   private _moveCount: number; // for clearing auto-abort timout
+  private _gameDuration: number;
 
-  constructor(whitePlayerId: string, blackPlayerId: string) {
+  constructor(
+    whitePlayerId: string,
+    blackPlayerId: string,
+    gameDuration: number
+  ) {
     this._gameState = new Chess();
     this._whitePlayerId = whitePlayerId;
     this._blackPlayerId = blackPlayerId;
@@ -30,6 +35,7 @@ class GameState {
     this._timer = setTimeout(() => {
       console.log("logic to abort game to abandonment");
     }, 60 * 1000);
+    this._gameDuration = gameDuration;
   }
 
   get gameState(): Chess {
@@ -40,6 +46,9 @@ class GameState {
   }
   get blackPlayer(): string {
     return this._blackPlayerId;
+  }
+  get gameDuration(): number {
+    return this._gameDuration;
   }
 
   //validate and play move

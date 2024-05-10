@@ -3,7 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import cors from "cors";
 import SocketService from "./socket/socketService.js";
-import { GameState } from "./game/game.js";
+import gameManager from "./game/gameManager.js";
 
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
@@ -14,7 +14,7 @@ const PORT = process.env.PORT;
 
 const app = express();
 const server = createServer(app);
-const activeGames: Map<string, GameState> = new Map<string, GameState>(); //will contain currently active games
+const gamesHandler: gameManager = new gameManager();
 
 app.use(
   cors({
@@ -42,4 +42,4 @@ server.listen(PORT, () => {
   console.log(`server listening on PORT: ${PORT}`);
 });
 
-export { socketServer, activeGames, emitSocketEvent };
+export { socketServer, gamesHandler, emitSocketEvent };
