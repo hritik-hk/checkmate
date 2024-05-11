@@ -11,7 +11,14 @@ export default function Game() {
   const { gameId } = useParams();
   const { authUser } = useAuth();
 
-  const { currGameInfo, gameState } = useGame();
+  const {
+    currGameInfo,
+    gameState,
+    myCountDown,
+    setMyCountDown,
+    opponentCountDown,
+    setOpponentCountDown,
+  } = useGame();
 
   useEffect(() => {
     if (socket) {
@@ -21,21 +28,39 @@ export default function Game() {
 
   return (
     <>
-      {currGameInfo && authUser && gameState && (
-        <div className="bg-stone-700">
-          <div className="w-[600px] h-[600px]">
-            <div className="text-4xl">OPPONENT INFO AND TIME</div>
-            <Board
-              gameId={currGameInfo?.gameId}
-              gameState={gameState}
-              boardOrientation={
-                currGameInfo.whitePlayer == authUser?.id ? "white" : "black"
-              }
-            />
-            <div className="text-4xl">My INFO AND TIME</div>
+      {currGameInfo &&
+        authUser &&
+        gameState &&
+        myCountDown &&
+        opponentCountDown && (
+          <div className="bg-stone-700">
+            <div className="w-[600px] h-[600px]">
+              <Board
+                gameId={currGameInfo?.gameId}
+                gameState={gameState}
+                boardOrientation={
+                  currGameInfo.whitePlayer.id == authUser?.id
+                    ? "white"
+                    : "black"
+                }
+                myCountDown={myCountDown / 1000} // pass in seconds
+                opponentCountDown={opponentCountDown / 1000} // pass in seconds
+                setMyCountDown={setMyCountDown}
+                setOpponentCountDown={setOpponentCountDown}
+                opponentInfo={
+                  currGameInfo?.whitePlayer.id === authUser?.id
+                    ? currGameInfo?.blackPlayer
+                    : currGameInfo.whitePlayer
+                }
+                myInfo={
+                  currGameInfo?.whitePlayer.id === authUser?.id
+                    ? currGameInfo.whitePlayer
+                    : currGameInfo?.blackPlayer
+                }
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </>
   );
 }

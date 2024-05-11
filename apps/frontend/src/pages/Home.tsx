@@ -4,7 +4,6 @@ import { useSocket } from "../hooks/socket";
 import { GameEvent } from "../utils/constant";
 import Navbar from "@/components/Navbar";
 import { CreateTournament } from "@/components/CreateTournament";
-import CountDown from "@/components/CountDown";
 
 export default function Home() {
   const { socket } = useSocket();
@@ -66,9 +65,6 @@ export default function Home() {
           </button>
         </div>
         <CreateTournament />
-        <div className="mt-10 text-white">
-          <CountDown />
-        </div>
       </div>
     </>
   );

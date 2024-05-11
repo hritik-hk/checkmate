@@ -15,8 +15,18 @@ export interface authUserType {
 export interface gameInfoInterface {
   gameId: string;
   boardStatus: string;
-  whitePlayer: string;
-  blackPlayer: string;
+  whitePlayer: {
+    id: string;
+    blitz_rating: number;
+    rapid_rating: number;
+    username: string;
+  };
+  blackPlayer: {
+    id: string;
+    blitz_rating: number;
+    rapid_rating: number;
+    username: string;
+  };
   timeUsedByWhitePlayer: number;
   timeUsedByBlackPlayer: number;
   gameDuration: number;
@@ -42,6 +52,10 @@ export interface GameContextInterface {
   setCurrGameInfo: Dispatch<React.SetStateAction<gameInfoInterface | null>>;
   gameState: Chess | null;
   setGameState: React.Dispatch<React.SetStateAction<Chess | null>>;
+  myCountDown: number | null;
+  setMyCountDown: React.Dispatch<React.SetStateAction<number>>;
+  opponentCountDown: number | null;
+  setOpponentCountDown: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export interface user {
@@ -60,4 +74,20 @@ export interface boardProps {
   gameId: string;
   gameState: Chess;
   boardOrientation: BoardOrientation;
+  myCountDown: number;
+  opponentCountDown: number;
+  setMyCountDown: React.Dispatch<React.SetStateAction<number>>;
+  setOpponentCountDown: React.Dispatch<React.SetStateAction<number>>;
+  opponentInfo: {
+    id: string;
+    blitz_rating: number;
+    rapid_rating: number;
+    username: string;
+  };
+  myInfo: {
+    id: string;
+    blitz_rating: number;
+    rapid_rating: number;
+    username: string;
+  };
 }

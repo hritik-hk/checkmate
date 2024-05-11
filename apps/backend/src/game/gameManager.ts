@@ -1,5 +1,6 @@
 import { GameState } from "./game.js";
 import { IGame, ITournamentGame } from "../interfaces/common.js";
+import db from "../configs/database.js";
 
 class gameManager {
   private activeGames: Map<string, GameState>; //will contain currently active games
@@ -22,14 +23,38 @@ class gameManager {
     return this.activeGames.get(gameId);
   }
 
-  public getGameInfo(gameId: string) {
+  public async getGameInfo(gameId: string) {
     const game = this.activeGames.get(gameId);
+
+    const whitePlayer = await db.user.findFirst({
+      where: {
+        id: game?.whitePlayer,
+      },
+      select: {
+        id: true,
+        blitz_rating: true,
+        rapid_rating: true,
+        username: true,
+      },
+    });
+
+    const blackPlayer = await db.user.findFirst({
+      where: {
+        id: game?.blackPlayer,
+      },
+      select: {
+        id: true,
+        blitz_rating: true,
+        rapid_rating: true,
+        username: true,
+      },
+    });
 
     const gameInfo = {
       gameId,
       boardStatus: game?.gameState.fen(),
-      whitePlayer: game?.whitePlayer,
-      blackPlayer: game?.blackPlayer,
+      whitePlayer: whitePlayer,
+      blackPlayer: blackPlayer,
       timeUsedByWhitePlayer: game?.getWhitePlayerTimeConsumed,
       timeUsedByBlackPlayer: game?.getBlackPlayerTimeConsumed,
       gameDuration: game?.gameDuration,

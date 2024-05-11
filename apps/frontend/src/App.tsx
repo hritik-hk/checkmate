@@ -14,7 +14,12 @@ function App() {
   const { isLoggedIn, setIsLoggedIn, setAuthUser } = useAuth();
   const { socket } = useSocket();
   const navigate = useNavigate();
-  const { setCurrGameInfo, setGameState } = useGame();
+  const {
+    setCurrGameInfo,
+    setGameState,
+    setMyCountDown,
+    setOpponentCountDown,
+  } = useGame();
 
   //TO DO : allow user to accept or decline incoming game request
   const handleGameRequest = async (request: any) => {
@@ -37,8 +42,11 @@ function App() {
   };
 
   const handleJoinGame = (gameInfo: gameInfoInterface) => {
+    const { gameDuration, boardStatus } = gameInfo;
     setCurrGameInfo(gameInfo);
-    setGameState(new Chess(gameInfo.boardStatus));
+    setGameState(new Chess(boardStatus));
+    setMyCountDown(gameDuration);
+    setOpponentCountDown(gameDuration);
   };
 
   useEffect(() => {

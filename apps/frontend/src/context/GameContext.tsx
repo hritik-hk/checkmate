@@ -9,6 +9,8 @@ const GameContextProvider = ({ children }: { children?: ReactNode }) => {
   const [currGameInfo, setCurrGameInfo] = useState<gameInfoInterface | null>(
     null
   );
+  const [myCountDown, setMyCountDown] = useState<number>(0);
+  const [opponentCountDown, setOpponentCountDown] = useState<number>(0);
 
   return (
     <GameContext.Provider
@@ -17,6 +19,10 @@ const GameContextProvider = ({ children }: { children?: ReactNode }) => {
         setCurrGameInfo,
         gameState,
         setGameState,
+        myCountDown,
+        setMyCountDown,
+        opponentCountDown,
+        setOpponentCountDown,
       }}
     >
       {children}

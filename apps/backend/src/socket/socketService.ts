@@ -42,19 +42,18 @@ export default class SocketService {
     });
   }
 
-  private mountMakeMoveEvent(socket: ISocket, io: Server) {
+  private mountMakeMoveEvent(socket: ISocket) {
     socket.on(GameEvent.MOVE_UPDATE_EVENT, (gameId: string, update: string) => {
       const moveUpdate = JSON.parse(update);
 
       //update the gameState by playing the move
       const currGame = gamesHandler.getGame(gameId);
       const move = { from: moveUpdate.from, to: moveUpdate.to };
-      currGame?.makeMove(move, socket?.user?.id as string);
+      const result = currGame?.makeMove(move, socket?.user?.id as string);
 
-      io.in(gameId).emit(
-        GameEvent.MOVE_UPDATE_EVENT,
-        currGame?.gameState.fen()
-      );
+      if (result) {
+        socket.to(gameId).emit(GameEvent.MOVE_UPDATE_EVENT, move);
+      }
     });
   }
 
@@ -109,7 +108,7 @@ export default class SocketService {
     io.on("connection", async (socket: ISocket) => {
       try {
         // Common events that needs to be mounted on the initialization
-        this.mountMakeMoveEvent(socket, io);
+        this.mountMakeMoveEvent(socket);
         this.mountGameReqEvent(socket, io);
         this.mountInitGameEvent(socket);
         this.mountJoinGameEvent(socket);
