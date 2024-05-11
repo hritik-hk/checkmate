@@ -1,7 +1,7 @@
 import { getUrl } from "../utils/helpers";
 import { user } from "../interfaces/common";
 
-export const getUserByUsername = async ({ username }: { username: string }) => {
+export const getUserByUsername = async (username: string) => {
   try {
     const resp = await fetch(getUrl(`user/${username}`), {
       credentials: "include",
@@ -17,4 +17,3 @@ export const getUserByUsername = async ({ username }: { username: string }) => {
     console.error(err);
   }
 };
-

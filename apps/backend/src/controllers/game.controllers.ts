@@ -9,9 +9,10 @@ import { gamesHandler } from "../index.js";
 
 export const createNewGame = async (req: IRequest, res: Response) => {
   try {
+    console.log(req.body);
     const recipientId = req.body.recipientId;
     const gameType: GameType = req.body.gameType;
-    const gameDuration = req.body.gameDuration;
+    const gameDuration = parseInt(req.body.gameDuration);
 
     // Check if it's a valid receiver
     const receiver = await db.user.findUnique({

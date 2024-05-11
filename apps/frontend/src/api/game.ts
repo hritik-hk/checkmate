@@ -1,10 +1,16 @@
 import { getUrl } from "../utils/helpers";
 
-export const createGame = async ({ id }: { id: string }) => {
+export const createGame = async (data: any) => {
   try {
-    const resp = await fetch(getUrl(`game/new/${id}`), {
+    console.log(data);
+    const resp = await fetch(getUrl(`game/new`), {
       credentials: "include",
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(data),
     });
+
+    console.log(resp);
 
     if (!resp.ok) {
       throw new Error("user not found");

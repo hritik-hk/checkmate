@@ -17,14 +17,9 @@ export default function Board({
   setOpponentCountDown,
   opponentInfo,
   myInfo,
+  whitePlayerId,
 }: boardProps) {
   const { socket } = useSocket();
-
-  const myMinLeft = Math.floor(myCountDown / 60);
-  const mySecLeft = Math.floor(myCountDown % 60);
-
-  const opponentMinLeft = Math.floor(opponentCountDown / 60);
-  const opponentSecLeft = Math.floor(opponentCountDown % 60);
 
   const myTimerId = useRef<NodeJS.Timeout | null>(null); // useRef hook to store interval ID
   const opponentTimerId = useRef<NodeJS.Timeout | null>(null);
@@ -48,7 +43,8 @@ export default function Board({
     if (!myTimerId.current) {
       myTimerId.current = setInterval(() => {
         setMyCountDown((prevSeconds) => {
-          if (prevSeconds <= 1) {
+          if (prevSeconds === null) return null;
+          else if (prevSeconds <= 1) {
             stopMyTimer();
             return 0;
           } else return prevSeconds - 1;
@@ -61,7 +57,8 @@ export default function Board({
     if (!opponentTimerId.current) {
       opponentTimerId.current = setInterval(() => {
         setOpponentCountDown((prevSeconds) => {
-          if (prevSeconds <= 1) {
+          if (prevSeconds === null) return null;
+          else if (prevSeconds <= 1) {
             stopOpponentTimer();
             return 0;
           } else return prevSeconds - 1;
@@ -87,8 +84,13 @@ export default function Board({
   }, [socket]);
 
   useEffect(() => {
-    startMyTimer();
-    startOpponentTimer();
+    if (gameState.turn() === "w" && whitePlayerId === myInfo.id) {
+      startMyTimer();
+    } else if (gameState.turn() === "b" && whitePlayerId !== myInfo.id) {
+      startMyTimer();
+    } else {
+      startOpponentTimer();
+    }
 
     return () => {
       stopMyTimer();
@@ -97,7 +99,7 @@ export default function Board({
   }, []);
 
   function sendMoveUpdate(move: moveType) {
-    socket?.emit(GameEvent.MOVE_UPDATE_EVENT, gameId, move);
+    socket?.emit(GameEvent.MOVE_UPDATE_EVENT, gameId, JSON.stringify(move));
   }
 
   function makeAMove(move: moveType) {
@@ -144,9 +146,9 @@ export default function Board({
 
   return (
     <div>
-      <div>
+      <div className="flex justify-around">
         <div>{opponentInfo.username}</div>
-        <CountDown minLeft={opponentMinLeft} secLeft={opponentSecLeft} />
+        {opponentCountDown && <CountDown seconds={opponentCountDown} />}
       </div>
 
       <Chessboard
@@ -157,9 +159,9 @@ export default function Board({
         clearPremovesOnRightClick={true}
         onPieceDrop={onDrop}
       />
-      <div>
+      <div className="flex justify-around">
         <div>{myInfo.username}</div>
-        <CountDown minLeft={myMinLeft} secLeft={mySecLeft} />
+        {myCountDown && <CountDown seconds={myCountDown} />}
       </div>
     </div>
   );

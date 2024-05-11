@@ -53,9 +53,9 @@ export interface GameContextInterface {
   gameState: Chess | null;
   setGameState: React.Dispatch<React.SetStateAction<Chess | null>>;
   myCountDown: number | null;
-  setMyCountDown: React.Dispatch<React.SetStateAction<number>>;
+  setMyCountDown: React.Dispatch<React.SetStateAction<number | null>>;
   opponentCountDown: number | null;
-  setOpponentCountDown: React.Dispatch<React.SetStateAction<number>>;
+  setOpponentCountDown: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 export interface user {
@@ -74,10 +74,11 @@ export interface boardProps {
   gameId: string;
   gameState: Chess;
   boardOrientation: BoardOrientation;
-  myCountDown: number;
-  opponentCountDown: number;
-  setMyCountDown: React.Dispatch<React.SetStateAction<number>>;
-  setOpponentCountDown: React.Dispatch<React.SetStateAction<number>>;
+  myCountDown: number | null;
+  opponentCountDown: number | null;
+  setMyCountDown: React.Dispatch<React.SetStateAction<number | null>>;
+  setOpponentCountDown: React.Dispatch<React.SetStateAction<number | null>>;
+  whitePlayerId: string;
   opponentInfo: {
     id: string;
     blitz_rating: number;

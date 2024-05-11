@@ -21,9 +21,10 @@ export default class SocketService {
   }
 
   private mountGameReqEvent(socket: ISocket, io: Server) {
-    socket.on(GameEvent.GAME_REQUEST, (opponentId) => {
+    socket.on(GameEvent.GAME_REQUEST, (opponentId, gameInfo) => {
       io.in(opponentId).emit(GameEvent.GAME_REQUEST, {
         requestedBy: socket.user?.id,
+        gameInfo,
       });
     });
   }
@@ -36,8 +37,8 @@ export default class SocketService {
   }
 
   private mountJoinGameEvent(socket: ISocket) {
-    socket.on(GameEvent.JOIN_GAME, (gameId: string) => {
-      const gameInfo = gamesHandler.getGameInfo(gameId);
+    socket.on(GameEvent.JOIN_GAME, async (gameId: string) => {
+      const gameInfo = await gamesHandler.getGameInfo(gameId);
       socket.emit(GameEvent.JOIN_GAME, gameInfo);
     });
   }

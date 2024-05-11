@@ -55,8 +55,8 @@ class gameManager {
       boardStatus: game?.gameState.fen(),
       whitePlayer: whitePlayer,
       blackPlayer: blackPlayer,
-      timeUsedByWhitePlayer: game?.getWhitePlayerTimeConsumed,
-      timeUsedByBlackPlayer: game?.getBlackPlayerTimeConsumed,
+      timeUsedByWhitePlayer: game?.getWhitePlayerTimeConsumed(),
+      timeUsedByBlackPlayer: game?.getBlackPlayerTimeConsumed(),
       gameDuration: game?.gameDuration,
     };
 

@@ -12,15 +12,15 @@ export default function Home() {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const username = Object.fromEntries(formData) as { username: string };
-    const opponentUser = await getUserByUsername(username);
+    const data = Object.fromEntries(formData) as {
+      username: string;
+      gameType: string;
+      gameDuration: string;
+    };
+    console.log(data);
+    const opponentUser = await getUserByUsername(data.username);
     if (opponentUser) {
-      //const newGame = await createGame({ id: opponentUser.id });
-
-      socket?.emit(GameEvent.GAME_REQUEST, opponentUser.id);
-      // localStorage.setItem("activeGame", JSON.stringify(newGame));
-
-      //navigate("/newgame");
+      socket?.emit(GameEvent.GAME_REQUEST, opponentUser.id, data);
     }
   }
 
@@ -45,6 +45,20 @@ export default function Home() {
                 name="username"
                 className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="find opponents using username..."
+                required
+              />
+              <input
+                type="text"
+                name="gameType"
+                className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="tell game type"
+                required
+              />
+              <input
+                type="text"
+                name="gameDuration"
+                className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="tell game duration in ms"
                 required
               />
               <button

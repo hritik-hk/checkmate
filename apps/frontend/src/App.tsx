@@ -11,7 +11,7 @@ import { gameInfoInterface } from "./interfaces/common";
 import { Chess } from "chess.js";
 
 function App() {
-  const { isLoggedIn, setIsLoggedIn, setAuthUser } = useAuth();
+  const { isLoggedIn, setIsLoggedIn, setAuthUser, authUser } = useAuth();
   const { socket } = useSocket();
   const navigate = useNavigate();
   const {
@@ -25,12 +25,12 @@ function App() {
   const handleGameRequest = async (request: any) => {
     console.log(request);
 
-    const { requestedBy } = request;
+    const { requestedBy, gameInfo } = request;
 
     // handle request
-    const newGame = await createGame({ id: requestedBy });
+    const newGame = await createGame({ recipientId: requestedBy, ...gameInfo });
 
-    socket?.emit(GameEvent.START_GAME, newGame.id);
+    //socket?.emit(GameEvent.START_GAME, newGame.id);
   };
 
   const handleInitGame = (gameId: string) => {
@@ -42,11 +42,40 @@ function App() {
   };
 
   const handleJoinGame = (gameInfo: gameInfoInterface) => {
-    const { gameDuration, boardStatus } = gameInfo;
+    console.log("gameInfo", gameInfo);
+    const {
+      gameDuration,
+      boardStatus,
+      timeUsedByBlackPlayer,
+      timeUsedByWhitePlayer,
+      whitePlayer,
+    } = gameInfo;
+
+    const myTimeConsumed =
+      whitePlayer.id === authUser?.id
+        ? timeUsedByWhitePlayer
+        : timeUsedByBlackPlayer;
+
+    const opponentTimeConsumed =
+      timeUsedByWhitePlayer === myTimeConsumed
+        ? timeUsedByBlackPlayer
+        : timeUsedByWhitePlayer;
+
     setCurrGameInfo(gameInfo);
     setGameState(new Chess(boardStatus));
-    setMyCountDown(gameDuration);
-    setOpponentCountDown(gameDuration);
+    console.log(
+      "my duration",
+      Math.floor((gameDuration - myTimeConsumed) / 1000)
+    );
+    console.log(
+      "oppo duration",
+      Math.floor((gameDuration - opponentTimeConsumed) / 1000)
+    );
+
+    setMyCountDown(Math.floor((gameDuration - myTimeConsumed) / 1000));
+    setOpponentCountDown(
+      Math.floor((gameDuration - opponentTimeConsumed) / 1000)
+    );
   };
 
   useEffect(() => {

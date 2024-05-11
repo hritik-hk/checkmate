@@ -43,8 +43,9 @@ export default function Game() {
                     ? "white"
                     : "black"
                 }
-                myCountDown={myCountDown / 1000} // pass in seconds
-                opponentCountDown={opponentCountDown / 1000} // pass in seconds
+                whitePlayerId={currGameInfo.whitePlayer.id}
+                myCountDown={myCountDown}
+                opponentCountDown={opponentCountDown}
                 setMyCountDown={setMyCountDown}
                 setOpponentCountDown={setOpponentCountDown}
                 opponentInfo={
