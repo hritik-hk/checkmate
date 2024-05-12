@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
+import tournament from "../assets/tournament.svg";
 
 export function CreateTournament() {
   const navigate = useNavigate();
@@ -22,7 +23,12 @@ export function CreateTournament() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Create Tournament</Button>
+        <Button className="text-2xl text-white bg-neutral-800 hover:bg-neutral-600 font-md tracking-wide rounded-lg px-10 py-10">
+          <span className="mr-3">
+            <img className="w-14" src={tournament} alt="" />
+          </span>
+          Create Tournament
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
