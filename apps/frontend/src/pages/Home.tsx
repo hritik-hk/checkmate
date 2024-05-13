@@ -1,9 +1,6 @@
-import { startRandomGame } from "../api/game";
 import Navbar from "@/components/Navbar";
 import { CreateTournament } from "@/components/CreateTournament";
 import { PlayFriends } from "@/components/PlayFriends";
-import { Button } from "@/components/ui/button";
-import stranger from "../assets/stranger.svg";
 import blitz from "../assets/blitz.svg";
 import clock from "../assets/clock.svg";
 import { useAuth } from "@/hooks/auth";
@@ -11,17 +8,10 @@ import { ActiveEvents } from "@/components/ActiveEvents";
 import { Separator } from "@radix-ui/react-separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import avatar from "../assets/avatar.svg";
+import PlayStranger from "@/components/PlayStranger";
 
 export default function Home() {
   const { authUser } = useAuth();
-
-  async function handleRandomGame() {
-    try {
-      await startRandomGame();
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
   const friendList = Array.from({ length: 5 }).map((_, i) => `Friend ${i + 1}`);
 
@@ -68,15 +58,7 @@ export default function Home() {
               <PlayFriends />
             </div>
             <div className="my-3">
-              <Button
-                className="w-3/4 text-2xl text-white bg-stone-800 hover:bg-neutral-600 font-md tracking-wide rounded-lg px-10 py-10"
-                onClick={handleRandomGame}
-              >
-                <span className="mr-3">
-                  <img className="w-20" src={stranger} alt="" />
-                </span>
-                Play with Stranger
-              </Button>
+              <PlayStranger />
             </div>
             <CreateTournament />
           </div>

@@ -22,7 +22,7 @@ export default function AppRoutes() {
         path="/game/:gameId"
         element={
           <Protected>
-            <Game />,
+            <Game />
           </Protected>
         }
       />

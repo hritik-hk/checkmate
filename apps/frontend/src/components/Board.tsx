@@ -146,8 +146,13 @@ export default function Board({
 
   return (
     <div>
-      <div className="flex justify-around">
-        <div>{opponentInfo.username}</div>
+      <div className="flex justify-between mb-3 bg-neutral-900 rounded-md p-3">
+        <div className="text-xl font-sans font-semibold">
+          {opponentInfo.username}
+          <span className="text-base font-medium text-gray-400 ml-1">
+            (600)
+          </span>
+        </div>
         {opponentCountDown && <CountDown seconds={opponentCountDown} />}
       </div>
 
@@ -159,8 +164,13 @@ export default function Board({
         clearPremovesOnRightClick={true}
         onPieceDrop={onDrop}
       />
-      <div className="flex justify-around">
-        <div>{myInfo.username}</div>
+      <div className="flex justify-between mt-3 bg-neutral-900 rounded-md p-3">
+        <div className="text-xl font-sans font-semibold">
+          {myInfo.username}
+          <span className="text-base font-medium text-gray-400 ml-1">
+            (700)
+          </span>
+        </div>
         {myCountDown && <CountDown seconds={myCountDown} />}
       </div>
     </div>

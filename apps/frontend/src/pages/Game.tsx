@@ -5,6 +5,7 @@ import { GameEvent } from "@/utils/constant";
 import { useParams } from "react-router-dom";
 import { useGame } from "@/hooks/game";
 import { useAuth } from "@/hooks/auth";
+import Navbar from "@/components/Navbar";
 
 export default function Game() {
   const { socket } = useSocket();
@@ -28,13 +29,14 @@ export default function Game() {
 
   return (
     <>
+      <Navbar />
       {currGameInfo &&
         authUser &&
         gameState &&
         myCountDown &&
         opponentCountDown && (
-          <div className="bg-stone-700">
-            <div className="w-[600px] h-[600px]">
+          <div className="flex justify-center bg-stone-700 h-screen py-5">
+            <div className="w-screen md:w-2/5">
               <Board
                 gameId={currGameInfo?.gameId}
                 gameState={gameState}

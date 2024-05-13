@@ -12,7 +12,7 @@ export const createNewGame = async (req: IRequest, res: Response) => {
     console.log(req.body);
     const recipientId = req.body.recipientId;
     const gameType: GameType = req.body.gameType;
-    const gameDuration = parseInt(req.body.gameDuration);
+    const gameDuration = req.body.gameDuration;
 
     // Check if it's a valid receiver
     const receiver = await db.user.findUnique({

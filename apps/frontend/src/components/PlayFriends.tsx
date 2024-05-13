@@ -16,15 +16,19 @@ import { GameEvent } from "../utils/constant";
 import { getUserByUsername } from "../api/user";
 import { Button } from "./ui/button";
 import friend from "../assets/friend.svg";
+import { user } from "@/interfaces/common";
 
 export function PlayFriends() {
   const navigate = useNavigate();
   const { socket } = useSocket();
 
-  const [gameType, setGameType] = useState<{
-    type: string;
-    duration: number;
+  const [game, setGame] = useState<{
+    gameType: string;
+    gameDuration: number;
   } | null>(null);
+
+  const [friendUsername, setFriendUsername] = useState<string | null>(null);
+  const [opponentUser, setOpponentUser] = useState<user | null>(null);
 
   const options = [
     {
@@ -43,23 +47,31 @@ export function PlayFriends() {
     },
   ];
 
-  async function handleSearch(e: any) {
-    e.preventDefault();
+  async function handleSearch() {
+    if (friendUsername === null) return;
 
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData) as {
-      username: string;
-      gameType: string;
-      gameDuration: string;
-    };
-    console.log(data);
-    const opponentUser = await getUserByUsername(data.username);
+    console.log(friendUsername);
+
+    const user = await getUserByUsername(friendUsername);
+    if (user) {
+      setOpponentUser(user);
+    } else {
+      //TO Do: display invalid email or username
+      console.log("invalid email or username");
+    }
+  }
+
+  function handlePlay() {
     if (opponentUser) {
-      socket?.emit(GameEvent.GAME_REQUEST, opponentUser.id, data);
+      socket?.emit(GameEvent.GAME_REQUEST, opponentUser.id, game);
     }
   }
 
   const friendList = Array.from({ length: 5 }).map((_, i) => `Friend ${i + 1}`);
+
+  function handlegame(gameType: string, gameDuration: number) {
+    setGame({ gameType, gameDuration });
+  }
 
   return (
     <Dialog>
@@ -71,11 +83,11 @@ export function PlayFriends() {
           Play with friend
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-w-[400px] md:max-w-[425px] bg-stone-700">
         <DialogHeader>
           <DialogTitle>Play with friend</DialogTitle>
         </DialogHeader>
-        <div>Choose Game type</div>
+        <div>Choose a game type</div>
         <div className="mb-4">
           {options.map((type) => {
             return (
@@ -84,7 +96,15 @@ export function PlayFriends() {
                 <div className="my-4">
                   {type.value.map((duration) => {
                     return (
-                      <span className="mx-2 p-2 rounded-md bg-gray-200 font-bold text-gray-900">
+                      <span
+                        className="mx-2 py-3 px-5 rounded-md bg-stone-600 font-bold text-white cursor-pointer"
+                        style={
+                          game?.gameDuration === duration.value
+                            ? { border: "2px solid yellow" }
+                            : { border: "none" }
+                        }
+                        onClick={() => handlegame(type.label, duration.value)}
+                      >
                         {duration.label}
                       </span>
                     );
@@ -95,15 +115,21 @@ export function PlayFriends() {
           })}
         </div>
 
-        <div className="">Select friend</div>
+        <div className="">Select a friend</div>
         <div className="relative">
           <Input
             className="h-12 text-md"
             placeholder="Search by email or username"
+            onChange={(e: any) => setFriendUsername(e.target.value)}
           ></Input>
-          <Button className="absolute end-2.5 bottom-1.5">search</Button>
+          <Button
+            className="absolute end-2.5 bottom-1.5"
+            onClick={handleSearch}
+          >
+            search
+          </Button>
         </div>
-        <ScrollArea>
+        <ScrollArea className="">
           <ScrollArea className="rounded-md border h-40">
             <div className="p-4">
               <h4 className="mb-4 text-xl font-semibold leading-none">
@@ -122,7 +148,9 @@ export function PlayFriends() {
         </ScrollArea>
 
         <DialogFooter>
-          <Button onClick={handleSearch}>Play</Button>
+          <Button onClick={handlePlay}>
+            Play {opponentUser !== null ? `with ${opponentUser.username}` : ""}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
