@@ -28,7 +28,7 @@ export default function AppRoutes() {
       />
 
       <Route path="/login" element={<Login />} />
-      <Route path="/tournament/:id" element={<Tournament />} />
+      <Route path="/tournament" element={<Tournament />} />
 
       <Route path="*" element={<h1 className="text-5xl">404 Not found</h1>} />
     </Routes>

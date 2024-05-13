@@ -23,7 +23,7 @@ export function CreateTournament() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="text-2xl text-white bg-neutral-800 hover:bg-neutral-600 font-md tracking-wide rounded-lg px-10 py-10">
+        <Button className="w-3/4  text-2xl text-white bg-stone-800 hover:bg-neutral-600 font-md tracking-wide rounded-lg px-10 py-10">
           <span className="mr-3">
             <img className="w-14" src={tournament} alt="" />
           </span>

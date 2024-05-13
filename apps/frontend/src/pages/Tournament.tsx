@@ -2,44 +2,109 @@ import Countdown from "react-countdown";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import Navbar from "@/components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { count } from "console";
+import { FileTextIcon } from "@radix-ui/react-icons";
+import { Separator } from "@radix-ui/react-separator";
 
 const points = [
   {
+    position: "#1",
     username: "hritik",
     points: "5.5",
     rating: "1200",
   },
   {
+    position: "#1",
     username: "sara",
-    points: "2.5",
+    points: "5.5",
     rating: "1200",
   },
   {
+    position: "#2",
     username: "nikki",
     points: "3.5",
     rating: "1200",
   },
   {
+    position: "#3",
     username: "daksh",
-    points: "1.5",
+    points: "2.5",
     rating: "1200",
   },
   {
+    position: "#4",
     username: "sarthak",
     points: "2.5",
     rating: "1200",
   },
+];
+
+const fixture = [
+  [
+    {
+      player1: "sara",
+      player2: "daksh",
+    },
+    {
+      player1: "nikki",
+      player2: "sarthak",
+    },
+    {
+      player1: "hritik",
+      player2: "BYE",
+    },
+  ],
+  [
+    {
+      player1: "daksh",
+      player2: "nikki",
+    },
+    {
+      player1: "sarthak",
+      player2: "hritik",
+    },
+    {
+      player1: "sara",
+      player2: "BYE",
+    },
+  ],
+  [
+    {
+      player1: "nikki",
+      player2: "sara",
+    },
+    {
+      player1: "hritik",
+      player2: "daksh",
+    },
+    {
+      player1: "nikki",
+      player2: "BYE",
+    },
+  ],
+  [
+    {
+      player1: "hritik",
+      player2: "nikki",
+    },
+    {
+      player1: "sarthak",
+      player2: "sara",
+    },
+    {
+      player1: "daksh",
+      player2: "BYE",
+    },
+  ],
 ];
 
 export default function Tournament() {
@@ -108,7 +173,6 @@ export default function Tournament() {
   const renderer = ({ hours, minutes, seconds, completed }) => {
     if (completed) {
       //navigate("/toru");
-      handleStart();
       return <span>hello</span>;
     } else {
       // Render a countdown
@@ -127,26 +191,80 @@ export default function Tournament() {
   return (
     <>
       <Navbar />
-      <div>
-        <Table>
-          <TableCaption>POINTS TABLE</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">USERNAME</TableHead>
-              <TableHead>POINTS</TableHead>
-              <TableHead>RATING</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {points.map((point) => (
-              <TableRow key={point.username}>
-                <TableCell className="font-medium">{point.username}</TableCell>
-                <TableCell>{point.points}</TableCell>
-                <TableCell>{point.rating}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <div className="px-48 bg-stone-700">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2">
+          <div>
+            {/* points table */}
+
+            <div>
+              <h2 className="text-3xl font-semibold tracking-wide font-mono bg-stone-900 my-2 rounded-md p-3">
+                POINTS TABLE
+              </h2>
+              <Table className="bg-stone-900">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px]">Position</TableHead>
+                    <TableHead>Player</TableHead>
+                    <TableHead>Points</TableHead>
+                    <TableHead>Rating</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {points.map((player, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-bold">
+                        {player.position}
+                      </TableCell>
+                      <TableCell>{player.username}</TableCell>
+                      <TableCell>{player.points}</TableCell>
+                      <TableCell>{player.rating}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {/* ongoing games in tournament */}
+            <div>
+              <h2 className="text-2xl font-semibold tracking-wide font-mono bg-stone-900 mt-5 mb-3 rounded-md p-3">
+                Ongoing Tournament Games
+              </h2>
+              <div className="min-h-36 bg-stone-800">
+                <p className="text-xl py-4">No ongoing games...</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Tournament Fixture */}
+          <div>
+            <h2 className="text-3xl font-semibold tracking-wide font-mono bg-stone-900 my-2 rounded-md p-3">
+              Tournament Fixture
+            </h2>
+            <div className="bg-stone-800 p-4 rounded-md">
+              {fixture.map((round, ind) => {
+                return (
+                  <div>
+                    <h3 className="text-2xl font-semibold tracking-wide font-mono">
+                      ROUND {ind + 1}
+                    </h3>
+                    <Separator className="mb-2 text-slate-200 h-1" />
+                    {round.map((game) => {
+                      return (
+                        <div>
+                          <div className="flex">
+                            <p className="w-2/5">{game.player1}</p>
+                            <p className="w-1/5">VS</p>
+                            <p className="w-2/5">{game.player2}</p>
+                          </div>
+                          <Separator className="mb-2" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="p-5">
