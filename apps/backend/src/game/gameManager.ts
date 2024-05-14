@@ -1,6 +1,7 @@
 import { GameState } from "./game.js";
 import { IGame, ITournamentGame } from "../interfaces/common.js";
 import db from "../configs/database.js";
+import { GameType } from "@prisma/client";
 
 class gameManager {
   private activeGames: Map<string, GameState>; //will contain currently active games
@@ -12,6 +13,7 @@ class gameManager {
   public addGame(game: IGame | ITournamentGame) {
     //create the new game
     const newGame = new GameState(
+      game.id,
       game.whitePlayerId,
       game.blackPlayerId,
       game.gameDuration
@@ -58,6 +60,7 @@ class gameManager {
       timeUsedByWhitePlayer: game?.getWhitePlayerTimeConsumed(),
       timeUsedByBlackPlayer: game?.getBlackPlayerTimeConsumed(),
       gameDuration: game?.gameDuration,
+      gameType: (game?.gameDuration as number) > 300000 ? "RAPID" : "BLITZ",
     };
 
     return gameInfo;

@@ -18,6 +18,7 @@ export default function Board({
   opponentInfo,
   myInfo,
   whitePlayerId,
+  gameType,
 }: boardProps) {
   const { socket } = useSocket();
 
@@ -150,7 +151,9 @@ export default function Board({
         <div className="text-xl font-sans font-semibold">
           {opponentInfo.username}
           <span className="text-base font-medium text-gray-400 ml-1">
-            (600)
+            {gameType === "RAPID"
+              ? `(${opponentInfo.rapid_rating})`
+              : `(${opponentInfo.blitz_rating})`}
           </span>
         </div>
         {opponentCountDown && <CountDown seconds={opponentCountDown} />}
@@ -168,7 +171,9 @@ export default function Board({
         <div className="text-xl font-sans font-semibold">
           {myInfo.username}
           <span className="text-base font-medium text-gray-400 ml-1">
-            (700)
+            {gameType === "RAPID"
+              ? `(${myInfo.rapid_rating})`
+              : `(${myInfo.blitz_rating})`}
           </span>
         </div>
         {myCountDown && <CountDown seconds={myCountDown} />}

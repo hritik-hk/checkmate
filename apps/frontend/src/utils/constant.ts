@@ -17,4 +17,5 @@ export const GameEvent = {
   INIT_GAME: "INIT_GAME",
   MOVE_UPDATE_EVENT: "MOVE_UPDATE_EVENT",
   JOIN_GAME: "JOIN_GAME",
+  END_GAME: "END_GAME",
 } as const;

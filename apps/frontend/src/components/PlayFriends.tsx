@@ -32,17 +32,17 @@ export function PlayFriends() {
 
   const options = [
     {
-      label: "⚡BLITZ",
+      label: "BLITZ",
       value: [
-        { label: "3 min", value: 3 * 600000 },
-        { label: "5 min", value: 5 * 600000 },
+        { label: "3 min", value: 3 * 60000 },
+        { label: "5 min", value: 5 * 60000 },
       ],
     },
     {
-      label: "⌛RAPID",
+      label: "RAPID",
       value: [
-        { label: "10 min", value: 10 * 600000 },
-        { label: "30 min", value: 30 * 600000 },
+        { label: "10 min", value: 10 * 60000 },
+        { label: "30 min", value: 30 * 60000 },
       ],
     },
   ];

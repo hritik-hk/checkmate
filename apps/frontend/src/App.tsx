@@ -28,9 +28,7 @@ function App() {
     const { requestedBy, gameInfo } = request;
 
     // handle request
-    const newGame = await createGame({ recipientId: requestedBy, ...gameInfo });
-
-    //socket?.emit(GameEvent.START_GAME, newGame.id);
+    await createGame({ recipientId: requestedBy, ...gameInfo });
   };
 
   const handleInitGame = (gameId: string) => {

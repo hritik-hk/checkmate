@@ -30,6 +30,7 @@ export interface gameInfoInterface {
   timeUsedByWhitePlayer: number;
   timeUsedByBlackPlayer: number;
   gameDuration: number;
+  gameType: string;
 }
 
 export interface AuthContextInterface {
@@ -91,4 +92,5 @@ export interface boardProps {
     rapid_rating: number;
     username: string;
   };
+  gameType: string;
 }
