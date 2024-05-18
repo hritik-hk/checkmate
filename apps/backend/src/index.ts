@@ -4,6 +4,7 @@ import { createServer } from "http";
 import cors from "cors";
 import SocketService from "./socket/socketService.js";
 import gameManager from "./game/gameManager.js";
+import tournamentManager from "./tournament/tournamentManager.js";
 
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
@@ -15,6 +16,7 @@ const PORT = process.env.PORT;
 const app = express();
 const server = createServer(app);
 const gamesHandler: gameManager = new gameManager();
+const tournamentHandler: tournamentManager = new tournamentManager();
 
 app.use(
   cors({
@@ -42,4 +44,4 @@ server.listen(PORT, () => {
   console.log(`server listening on PORT: ${PORT}`);
 });
 
-export { socketServer, gamesHandler, emitSocketEvent };
+export { socketServer, gamesHandler, tournamentHandler, emitSocketEvent };

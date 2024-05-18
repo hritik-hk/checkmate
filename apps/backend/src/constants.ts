@@ -1,12 +1,8 @@
 export const SocketEvent = {
   CONNECTED_EVENT: "connected",
-
   DISCONNECT_EVENT: "disconnect",
-
   JOIN_ROOM_EVENT: "joinRoom",
-
   LEAVE_ROOM_EVENT: "leaveRoom",
-
   SOCKET_ERROR_EVENT: "socketError",
 } as const;
 
@@ -18,4 +14,8 @@ export const GameEvent = {
   MOVE_UPDATE_EVENT: "MOVE_UPDATE_EVENT",
   JOIN_GAME: "JOIN_GAME",
   END_GAME: "END_GAME",
+} as const;
+
+export const TournamentEvent = {
+  ROUND_UPDATE: "ROUND_UPDATE",
 } as const;

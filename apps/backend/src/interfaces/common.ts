@@ -60,9 +60,15 @@ export interface ITournamentGame {
 
 export interface IRound {
   id: string;
-  roundNumber: number;
   tournamentId: string;
+  roundNumber: number;
+  startTime: number;
+  endTime: number;
+  roundGames?: ITournamentGame[];
   bye?: string;
-  startTime: any;
-  endTime: any;
+}
+
+export interface ITournament {
+  id: string;
+  roundData: IRound[];
 }

@@ -66,7 +66,7 @@ function createSingleRoundRobin(
   const numRounds = numPlayers - 1; // num of rounds
   const halfNumPlayers = numPlayers / 2;
   const breakBtwRounds = 120000; // 2 min
-  const rounDuration = gameDuration * 2;
+  const roundDuration = gameDuration * 2;
 
   const playerIndexes = Array.from({ length: numPlayers }, (_, i) => i);
 
@@ -81,8 +81,8 @@ function createSingleRoundRobin(
       roundNumber: round,
       tournamentId,
       startTime:
-        Date.now() + round * breakBtwRounds + (round - 1) * rounDuration,
-      endTime: Date.now() + round * (breakBtwRounds + rounDuration),
+        Date.now() + round * breakBtwRounds + (round - 1) * roundDuration,
+      endTime: Date.now() + round * (breakBtwRounds + roundDuration),
     };
 
     for (let i = 0; i < halfNumPlayers; i++) {

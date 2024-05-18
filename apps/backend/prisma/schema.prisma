@@ -41,9 +41,10 @@ model Game {
   gameDuration  Int
   winnerId      String?
   isDraw        Boolean    @default(false)
-  moves         String[] //for now let it be strings
-  whitePlayer   User       @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
-  blackPlayer   User       @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
+  isGameOver    Boolean    @default(false)
+  moves       String[] //for now let it be strings
+  whitePlayer User     @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
+  blackPlayer User     @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
 }
 
 model Tournament {
@@ -66,6 +67,7 @@ model TournamentGame {
   gameDuration  Int
   winnerId      String?
   isDraw        Boolean    @default(false)
+  isGameOver    Boolean    @default(false)
   moves         String[] //for now let it be strings
   roundId       String
   tournament    Tournament @relation(fields: [tournamentId], references: [id])

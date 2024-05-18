@@ -1,8 +1,8 @@
 import db from "../configs/database.js";
-import { IGame, IRequest } from "../interfaces/common.js";
+import { IRequest } from "../interfaces/common.js";
 import { Response } from "express";
-import { tournament } from "../game/tournamentManager.js";
 import { createSingleRoundRobin } from "../utils/helpers.utils.js";
+import { tournamentHandler } from "../index.js";
 
 export const createTournament = async (req: IRequest, res: Response) => {
   try {
@@ -45,6 +45,11 @@ export const createTournament = async (req: IRequest, res: Response) => {
     const rounds = await db.round.createMany({
       data: tournamentData.rounds,
     });
+
+    //add to active tournaments
+    tournamentHandler.addTournament(newTournament, tournamentGames, rounds);
+
+    //To Do: emit socket event tournament start to all participants
 
     return res.status(200).json({ newTournament, tournamentGames, rounds });
   } catch (err) {
