@@ -7,12 +7,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import Navbar from "@/components/Navbar";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { FileTextIcon } from "@radix-ui/react-icons";
 import { Separator } from "@radix-ui/react-separator";
 
 const points = [
@@ -147,8 +144,6 @@ export default function Tournament() {
     },
   ];
 
-  const navigate = useNavigate();
-
   const [currRound, setCurrRound] = useState<(typeof roundData)[0] | null>(
     null
   );
@@ -170,9 +165,8 @@ export default function Tournament() {
   };
 
   // Renderer callback with condition
-  const renderer = ({ hours, minutes, seconds, completed }) => {
+  const renderer = ({ hours, minutes, seconds, completed }: any) => {
     if (completed) {
-      //navigate("/toru");
       return <span>hello</span>;
     } else {
       // Render a countdown

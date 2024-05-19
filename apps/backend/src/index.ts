@@ -9,6 +9,7 @@ import tournamentManager from "./tournament/tournamentManager.js";
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
 import gameRouter from "./routes/game.routes.js";
+import tournamentRouter from "./routes/tournament.routes.js";
 import isAuth from "./middlewares/auth.middlewares.js";
 
 const PORT = process.env.PORT;
@@ -37,6 +38,7 @@ const emitSocketEvent = (roomId: string, event: string, payload: any) => {
 app.use("/api/auth", authRouter);
 app.use("/api/user", isAuth, userRouter);
 app.use("/api/game", isAuth, gameRouter);
+app.use("/api/tournament", isAuth, tournamentRouter);
 
 socketServer.initializeSocketService();
 

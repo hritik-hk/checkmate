@@ -33,6 +33,15 @@ export interface gameInfoInterface {
   gameType: string;
 }
 
+export interface roundInterface {
+  id: string;
+  tournamentId: string;
+  roundNumber: number;
+  startTime: number;
+  endTime: number;
+  roundGames: [];
+}
+
 export interface AuthContextInterface {
   isLoggedIn: boolean;
   setIsLoggedIn: Dispatch<React.SetStateAction<boolean>>;
@@ -57,6 +66,33 @@ export interface GameContextInterface {
   setMyCountDown: React.Dispatch<React.SetStateAction<number | null>>;
   opponentCountDown: number | null;
   setOpponentCountDown: React.Dispatch<React.SetStateAction<number | null>>;
+}
+
+export interface points {
+  position: number;
+  player_username: string;
+  player_id: string;
+  points: number;
+  rating: number;
+}
+
+export interface fixtureRow {
+  round: number;
+  games: {
+    player1_username: string;
+    player1_id: string;
+    player2_username: string;
+    player2_id: string;
+  }[];
+}
+
+export interface TournamentContextInterface {
+  currRoundInfo: roundInterface | null;
+  setCurrRoundInfo: Dispatch<React.SetStateAction<roundInterface | null>>;
+  pointsTable: points[] | null;
+  setPointsTable: React.Dispatch<React.SetStateAction<points[] | null>>;
+  fixture: fixtureRow[] | null;
+  setFixture: React.Dispatch<React.SetStateAction<fixtureRow[] | null>>;
 }
 
 export interface user {

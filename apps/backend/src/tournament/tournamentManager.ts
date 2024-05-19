@@ -8,13 +8,13 @@ class tournamentManager {
     this._activeTournament = new Map<string, Tournament>();
   }
 
-  public addTournament(tournament: any, tournamentGames: any, rounds: any) {
-    console.log(tournament, tournamentGames, rounds);
-    return;
+  public async addTournament(tournamentId: string) {
 
+    return;
+   
     //create new tournament
-    const newTournament = new Tournament(tournament.id, tournament.roundData);
-    this._activeTournament.set(tournament.id, newTournament);
+    //const newTournament = new Tournament(tournament.id, tournament.roundData);
+    //this._activeTournament.set(tournament.id, newTournament);
   }
 
   public getGame(tournamentId: string) {
