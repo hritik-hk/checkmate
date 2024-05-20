@@ -1,5 +1,5 @@
 import Tournament from "./tournament.js";
-import { IGame, ITournament, ITournamentGame } from "../interfaces/common.js";
+import db from "../configs/database.js";
 
 class tournamentManager {
   private _activeTournament: Map<string, Tournament>; //will contain currently active Tournaments
@@ -9,32 +9,42 @@ class tournamentManager {
   }
 
   public async addTournament(tournamentId: string) {
+    try {
+      const rounds = await db.round.findMany({
+        where: { tournamentId: tournamentId },
+        orderBy: {
+          roundNumber: "asc",
+        },
+        select: {
+          id: true,
+          tournamentId: true,
+          roundNumber: true,
+          startTime: true,
+          endTime: true,
+          bye: true,
+          roundGames: true,
+        },
+      });
 
-    return;
-   
-    //create new tournament
-    //const newTournament = new Tournament(tournament.id, tournament.roundData);
-    //this._activeTournament.set(tournament.id, newTournament);
+      const newTournament = new Tournament(tournamentId, rounds);
+
+      this._activeTournament.set(tournamentId, newTournament);
+    } catch (err) {
+      console.log("error adding to active tournament: ", err);
+    }
   }
 
   public getGame(tournamentId: string) {
     return this._activeTournament.get(tournamentId);
   }
 
-  public async getTournamentIdInfo(tournamentId: string) {
+  public getCurrRoundInfo(tournamentId: string) {
     const tournament = this._activeTournament.get(tournamentId);
-
-    const tournamentInfo = {
-      tournamentId,
-      pointsTable: [],
-      fixture: [],
-      currRound: {
-        start: tournament?.getCurrRoundInfo().startTime,
-        end: tournament?.getCurrRoundInfo().endTime,
-      },
-    };
-
-    return tournamentInfo;
+    if (!tournament) {
+      console.log("invalid tournament id");
+      return;
+    }
+    return tournament.getCurrRoundInfo();
   }
 }
 

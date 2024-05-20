@@ -13,6 +13,8 @@ class Tournament {
   constructor(tournamentId: string, roundData: IRound[]) {
     this._tournamentId = tournamentId;
     this._rounds = Queue.fromArray(roundData);
+    const startDelay = Number(roundData[0]?.startTime) - Date.now();
+    const endDelay = Number(roundData[0]?.endTime) - Date.now();
 
     this._currRoundStart = setTimeout(() => {
       //initiate all round games
@@ -25,11 +27,11 @@ class Tournament {
         emitSocketEvent(game.blackPlayerId, GameEvent.INIT_GAME, game.id);
         emitSocketEvent(game.whitePlayerId, GameEvent.INIT_GAME, game.id);
       });
-    }, roundData[0]?.startTime);
+    }, startDelay);
 
     this._currRoundEnd = setTimeout(() => {
       this._resetRoundEnd();
-    }, roundData[0]?.endTime);
+    }, endDelay);
   }
 
   //reset currRoundStart
@@ -39,6 +41,7 @@ class Tournament {
     }
 
     const currRound = this._rounds.front();
+    const delay = Number(currRound?.startTime) - Date.now();
 
     this._currRoundStart = setTimeout(() => {
       //initiate all round games
@@ -51,7 +54,7 @@ class Tournament {
         emitSocketEvent(game.blackPlayerId, GameEvent.INIT_GAME, game.id);
         emitSocketEvent(game.whitePlayerId, GameEvent.INIT_GAME, game.id);
       });
-    }, currRound?.startTime - Date.now());
+    }, delay);
   }
 
   //reset currRoundEnd
@@ -67,6 +70,7 @@ class Tournament {
     //To Do: make updates in database
 
     const currRound = this._rounds.front();
+    const delay = Number(currRound?.endTime) - Date.now();
 
     //send round updates
     const roundUpdate = {
@@ -84,10 +88,11 @@ class Tournament {
 
     this._currRoundEnd = setTimeout(() => {
       this._resetRoundEnd();
-    }, currRound?.endTime - Date.now());
+    }, delay);
   }
 
   public getCurrRoundInfo() {
+    console.log(this._rounds);
     return this._rounds.front();
   }
 }

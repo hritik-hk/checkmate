@@ -62,10 +62,10 @@ export interface IRound {
   id: string;
   tournamentId: string;
   roundNumber: number;
-  startTime: number;
-  endTime: number;
+  startTime: string;
+  endTime: string;
   roundGames?: ITournamentGame[];
-  bye?: string;
+  bye?: string | null;
 }
 
 export interface ITournament {

@@ -4,8 +4,8 @@ import cookie from "cookie";
 import db from "../configs/database.js";
 import jwt from "jsonwebtoken";
 import { payload } from "../interfaces/common.js";
-import { GameEvent, SocketEvent } from "../constants.js";
-import { gamesHandler } from "../index.js";
+import { GameEvent, SocketEvent, TournamentEvent } from "../constants.js";
+import { gamesHandler, tournamentHandler } from "../index.js";
 
 export default class SocketService {
   private _io: Server;
@@ -40,6 +40,13 @@ export default class SocketService {
     socket.on(GameEvent.JOIN_GAME, async (gameId: string) => {
       const gameInfo = await gamesHandler.getGameInfo(gameId);
       socket.emit(GameEvent.JOIN_GAME, gameInfo);
+    });
+  }
+
+  private mountJoinTournamentEvent(socket: ISocket) {
+    socket.on(TournamentEvent.JOIN_TOURNAMENT, (tournamentId: string) => {
+      const currRoundInfo = tournamentHandler.getCurrRoundInfo(tournamentId);
+      socket.emit(TournamentEvent.ROUND_UPDATE, currRoundInfo);
     });
   }
 
@@ -113,6 +120,7 @@ export default class SocketService {
         this.mountGameReqEvent(socket, io);
         this.mountInitGameEvent(socket);
         this.mountJoinGameEvent(socket);
+        this.mountJoinTournamentEvent(socket);
 
         socket.on(SocketEvent.DISCONNECT_EVENT, () => {
           console.log("user has disconnected 🚫. userId: " + socket.user?.id);

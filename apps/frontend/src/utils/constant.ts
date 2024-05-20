@@ -19,3 +19,8 @@ export const GameEvent = {
   JOIN_GAME: "JOIN_GAME",
   END_GAME: "END_GAME",
 } as const;
+
+export const TournamentEvent = {
+  JOIN_TOURNAMENT: "JOIN_TOURNAMENT",
+  ROUND_UPDATE: "ROUND_UPDATE",
+} as const;

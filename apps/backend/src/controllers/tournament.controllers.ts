@@ -74,14 +74,18 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
     });
 
     let pointsTable: {
-      playerId: string;
-      playerName: string;
+      player_id: string;
+      player_username: string;
       gamesPlayed: number;
       point: number;
       rating: number;
+      position: number;
     }[] = [];
 
-    data?.participants.forEach(async (player) => {
+    if (!data) return res.status(400).json({ msg: "invalid tournament" });
+
+    for (let i = 0; i < data.participants.length; i++) {
+      const player = data.participants[i] as string;
       const games = await db.tournamentGame.findMany({
         where: {
           OR: [
@@ -129,6 +133,9 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
         },
       });
 
+      if (!user)
+        return res.status(400).json({ msg: "invalid user in tournament" });
+
       //calulate point
       let point = 0;
       for (let i = 0; i < games.length; i++) {
@@ -138,21 +145,32 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
       }
 
       pointsTable.push({
-        playerId: player,
-        playerName: user?.username as string,
+        player_id: player,
+        player_username: user?.username as string,
         gamesPlayed: games.length,
         point: point,
         rating:
           games[0]?.gameType === GameType.BLITZ
             ? (user?.blitz_rating as number)
             : (user?.rapid_rating as number),
+        position: 1,
       });
+    }
+
+    pointsTable.sort((a, b) => {
+      if (a.point === b.point) {
+        // when points are equal, compare by rating
+        return b.rating - a.rating;
+      } else {
+        // otherwise, compare by points
+        return b.point - a.point;
+      }
     });
 
-    res.status(200).json(pointsTable);
+    return res.status(200).json(pointsTable);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: error });
+    return res.status(500).json({ error: error });
   }
 };
 
@@ -174,7 +192,10 @@ export const getFixture = async (req: IRequest, res: Response) => {
 
     let fixture: any = [];
 
-    rounds.forEach(async (round) => {
+    for (let i = 0; i < rounds.length; i++) {
+      const round = rounds[i];
+      if (!round) return res.status(400).json({ msg: "invalid tournament" });
+
       const games = await db.tournamentGame.findMany({
         where: {
           roundId: round.id,
@@ -185,8 +206,10 @@ export const getFixture = async (req: IRequest, res: Response) => {
         },
       });
 
+      let roundGames = [];
+
       games.forEach((game) => {
-        fixture.push({
+        roundGames.push({
           player1_username: game.whitePlayer.username,
           player1_id: game.whitePlayer.id,
           player2_username: game.blackPlayer.username,
@@ -205,18 +228,23 @@ export const getFixture = async (req: IRequest, res: Response) => {
           },
         });
 
-        fixture.push({
+        roundGames.push({
           player1_username: byePlayer?.username,
           player1_id: byePlayer?.id,
           player2_username: "BYE",
           player2_id: "BYE",
         });
       }
-    });
 
-    res.status(200).json(fixture);
+      fixture.push({
+        round: round.roundNumber,
+        games: roundGames,
+      });
+    }
+
+    return res.status(200).json(fixture);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: err });
+    return res.status(500).json({ error: err });
   }
 };

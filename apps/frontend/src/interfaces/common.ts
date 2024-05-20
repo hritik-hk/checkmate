@@ -33,13 +33,28 @@ export interface gameInfoInterface {
   gameType: string;
 }
 
+export interface ITournamentGame {
+  id: string;
+  whitePlayerId: string;
+  blackPlayerId: string;
+  tournamentId: string;
+  status: "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+  gameType: "RAPID" | "BLITZ";
+  gameDuration: number;
+  winnerId: string | null;
+  isDraw: boolean;
+  moves: string[];
+  roundId: string;
+}
+
 export interface roundInterface {
   id: string;
   tournamentId: string;
   roundNumber: number;
-  startTime: number;
-  endTime: number;
-  roundGames: [];
+  startTime: string;
+  endTime: string;
+  bye?: string;
+  roundGames: ITournamentGame[];
 }
 
 export interface AuthContextInterface {
@@ -72,7 +87,8 @@ export interface points {
   position: number;
   player_username: string;
   player_id: string;
-  points: number;
+  point: number;
+  gamesPlayed: number;
   rating: number;
 }
 
@@ -87,12 +103,8 @@ export interface fixtureRow {
 }
 
 export interface TournamentContextInterface {
-  currRoundInfo: roundInterface | null;
-  setCurrRoundInfo: Dispatch<React.SetStateAction<roundInterface | null>>;
-  pointsTable: points[] | null;
-  setPointsTable: React.Dispatch<React.SetStateAction<points[] | null>>;
-  fixture: fixtureRow[] | null;
-  setFixture: React.Dispatch<React.SetStateAction<fixtureRow[] | null>>;
+  ongoingTournament: string | null;
+  setOngoingTournament: Dispatch<React.SetStateAction<string | null>>;
 }
 
 export interface user {

@@ -42,9 +42,9 @@ model Game {
   winnerId      String?
   isDraw        Boolean    @default(false)
   isGameOver    Boolean    @default(false)
-  moves       String[] //for now let it be strings
-  whitePlayer User     @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
-  blackPlayer User     @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
+  moves         String[] //for now let it be strings
+  whitePlayer   User       @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
+  blackPlayer   User       @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
 }
 
 model Tournament {
@@ -77,14 +77,14 @@ model TournamentGame {
 }
 
 model Round {
-  id             String           @id @default(uuid())
-  roundNumber    Int
-  tournamentId   String
-  bye            String?
-  startTime      BigInt
-  endTime        BigInt
-  TournamentGame TournamentGame[]
-  tournament     Tournament       @relation(fields: [tournamentId], references: [id])
+  id           String           @id @default(uuid())
+  roundNumber  Int
+  tournamentId String
+  bye          String?
+  startTime    String
+  endTime      String
+  roundGames   TournamentGame[]
+  tournament   Tournament       @relation(fields: [tournamentId], references: [id])
 }
 
 enum GameStatus {

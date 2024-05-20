@@ -1,9 +1,8 @@
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { hashPasswordType, jwtResponse } from "../interfaces/common.js";
+import { IRound, hashPasswordType, jwtResponse } from "../interfaces/common.js";
 import { GameStatus } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
-import { IRound } from "../interfaces/common.js";
 import { Chess, Square, Piece } from "chess.js";
 import { GameType } from "@prisma/client";
 
@@ -80,9 +79,15 @@ function createSingleRoundRobin(
       id: roundId,
       roundNumber: round,
       tournamentId,
-      startTime:
-        Date.now() + round * breakBtwRounds + (round - 1) * roundDuration,
-      endTime: Date.now() + round * (breakBtwRounds + roundDuration),
+      startTime: (
+        Date.now() +
+        round * breakBtwRounds +
+        (round - 1) * roundDuration
+      ).toString(),
+      endTime: (
+        Date.now() +
+        round * (breakBtwRounds + roundDuration)
+      ).toString(),
     };
 
     for (let i = 0; i < halfNumPlayers; i++) {
