@@ -22,45 +22,6 @@ export default function Tournament() {
 
   const { socket } = useSocket();
 
-  const roundData = [
-    {
-      roundNumber: 1,
-      isRoundComplete: false,
-      startTime: Date.now() + 12000,
-      endTime: Date.now() + 360000 + 120000,
-      roundGames: [
-        {
-          gameId: "111111",
-          whitePlayerId: "white111",
-          blackPlayerId: "black111",
-        },
-        {
-          gameId: "222222",
-          whitePlayerId: "white222",
-          blackPlayerId: "black222",
-        },
-      ],
-    },
-    {
-      roundNumber: 2,
-      isRoundComplete: false,
-      startTime: Date.now() + 360000 + 120000,
-      endTime: Date.now() + 2 * (360000 + 120000),
-      roundGames: [
-        {
-          gameId: "333333",
-          whitePlayerId: "white333",
-          blackPlayerId: "black333",
-        },
-        {
-          gameId: "444444",
-          whitePlayerId: "white444",
-          blackPlayerId: "black444",
-        },
-      ],
-    },
-  ];
-
   const [pointsTable, setPointsTable] = useState<points[] | null>(null);
   const [fixture, setFixture] = useState<fixtureRow[] | null>(null);
 

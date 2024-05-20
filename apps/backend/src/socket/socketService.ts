@@ -43,6 +43,13 @@ export default class SocketService {
     });
   }
 
+  private mountInitTournamentEvent(socket: ISocket) {
+    socket.on(TournamentEvent.INIT_TOURNAMENT, (tournamentId: string) => {
+      socket.join(tournamentId);
+      socket.emit(TournamentEvent.START_TOURNAMENT, tournamentId);
+    });
+  }
+
   private mountJoinTournamentEvent(socket: ISocket) {
     socket.on(TournamentEvent.JOIN_TOURNAMENT, (tournamentId: string) => {
       const currRoundInfo = tournamentHandler.getCurrRoundInfo(tournamentId);
@@ -121,6 +128,7 @@ export default class SocketService {
         this.mountInitGameEvent(socket);
         this.mountJoinGameEvent(socket);
         this.mountJoinTournamentEvent(socket);
+        this.mountInitTournamentEvent(socket);
 
         socket.on(SocketEvent.DISCONNECT_EVENT, () => {
           console.log("user has disconnected 🚫. userId: " + socket.user?.id);

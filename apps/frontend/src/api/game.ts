@@ -38,3 +38,24 @@ export const startRandomGame = async () => {
     console.log(err);
   }
 };
+
+export const getGamesHistory = async (username: string) => {
+  try {
+    const resp = await fetch(getUrl("game/history"), {
+      credentials: "include",
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ username }),
+    });
+
+    if (!resp.ok) {
+      throw new Error("something went wrong white fetch games history");
+    }
+
+    const data = await resp.json();
+    return data;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};

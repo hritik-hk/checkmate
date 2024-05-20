@@ -1,7 +1,18 @@
 import { Link } from "react-router-dom";
 import checkmateLogo from "../assets/checkmateLogo.png";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { FaSearch } from "react-icons/fa";
+import { useState } from "react";
 
 export default function Navbar() {
+  const [search, setSearch] = useState<string>("");
+
+  function handleSearch() {
+    console.log(search);
+    setSearch("");
+  }
+
   return (
     <>
       <nav className="bg-stone-900 text-white">
@@ -10,32 +21,31 @@ export default function Navbar() {
             <img src={checkmateLogo} className="h-16" alt="checkmate Logo" />
           </div>
           <div className="w-full md:block md:w-auto">
-            <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-              <li>
-                <Link
-                  to="/"
-                  className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
-                >
+            <div className=" flex items-center font-medium rounded-lg">
+              <div className="relative">
+                <Input
+                  className="h-12 text-md"
+                  placeholder="Search friends"
+                  value={search}
+                  onChange={(e: any) => setSearch(e.target.value)}
+                ></Input>
+                <div className="absolute end-2.5 bottom-1.5">
+                  <Button className="px-4" onClick={handleSearch}>
+                    <FaSearch />
+                  </Button>
+                </div>
+              </div>
+              <div className="mx-4 bg-white text-black p-2 rounded-md">
+                <Link to="/" className=" py-2 px-3rounded">
                   Home
                 </Link>
-              </li>
-              <li>
-                <Link
-                  to="/tournament/5ca2c957-b2a6-498e-9503-d5bca0c5b82e"
-                  className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-                >
-                  Your Tournaments
+              </div>
+              <div className="bg-white text-black p-2 rounded-md">
+                <Link to="/user" className=" py-2 px-3 rounded">
+                  Logout
                 </Link>
-              </li>
-              <li>
-                <Link
-                  to="/game/777"
-                  className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-                >
-                  game
-                </Link>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
         </div>
       </nav>

@@ -21,6 +21,8 @@ export const GameEvent = {
 } as const;
 
 export const TournamentEvent = {
+  INIT_TOURNAMENT: "INIT_TOURNAMENT",
+  START_TOURNAMENT: "START_TOURNAMENT",
   JOIN_TOURNAMENT: "JOIN_TOURNAMENT",
   ROUND_UPDATE: "ROUND_UPDATE",
 } as const;

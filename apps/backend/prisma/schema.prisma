@@ -32,6 +32,13 @@ model User {
   TournamentGamesAsBlack TournamentGame[] @relation("TournamentGamesAsBlack")
 }
 
+model FriendRequest {
+  senderId   String
+  receiverId String
+
+  @@id([senderId, receiverId])
+}
+
 model Game {
   id            String     @id @default(uuid())
   whitePlayerId String
@@ -43,6 +50,7 @@ model Game {
   isDraw        Boolean    @default(false)
   isGameOver    Boolean    @default(false)
   moves         String[] //for now let it be strings
+  createdAt     DateTime   @default(now())
   whitePlayer   User       @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
   blackPlayer   User       @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
 }
@@ -72,6 +80,7 @@ model TournamentGame {
   roundId       String
   tournament    Tournament @relation(fields: [tournamentId], references: [id])
   round         Round      @relation(fields: [roundId], references: [id])
+  createdAt     DateTime   @default(now())
   whitePlayer   User       @relation("TournamentGamesAsWhite", fields: [whitePlayerId], references: [id])
   blackPlayer   User       @relation("TournamentGamesAsBlack", fields: [blackPlayerId], references: [id])
 }

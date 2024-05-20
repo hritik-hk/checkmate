@@ -24,6 +24,10 @@ export const fetchUserByUsername = async (req: Request, res: Response) => {
         id: true,
         email: true,
         username: true,
+        blitz_rating: true,
+        rapid_rating: true,
+        createdAt: true,
+        friends: true,
       },
     });
 

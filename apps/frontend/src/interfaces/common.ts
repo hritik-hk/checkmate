@@ -111,6 +111,10 @@ export interface user {
   id: string;
   username: string;
   email: string;
+  blitz_rating: number;
+  rapid_rating: number;
+  createdAt: number;
+  friends: any;
 }
 
 export interface moveType {

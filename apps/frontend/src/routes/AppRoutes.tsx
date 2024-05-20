@@ -5,6 +5,7 @@ import Login from "../pages/Login";
 import Home from "../pages/Home";
 import Game from "../pages/Game";
 import Tournament from "@/pages/Tournament";
+import UserProfile from "@/pages/UserProfile";
 
 export default function AppRoutes() {
   return (
@@ -33,6 +34,15 @@ export default function AppRoutes() {
         element={
           <Protected>
             <Tournament />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/user"
+        element={
+          <Protected>
+            <UserProfile />
           </Protected>
         }
       />

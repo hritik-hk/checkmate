@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAuth } from "./hooks/auth";
 import { getUrl } from "./utils/helpers";
 import { useSocket } from "./hooks/socket";
-import { GameEvent } from "./utils/constant";
+import { GameEvent, TournamentEvent } from "./utils/constant";
 import { createGame } from "./api/game";
 import { useNavigate } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
@@ -37,6 +37,14 @@ function App() {
 
   const handleStartGame = (gameId: string) => {
     navigate(`/game/${gameId}`);
+  };
+
+  const handleInitTournament = (tournamentId: string) => {
+    socket?.emit(TournamentEvent.INIT_TOURNAMENT, tournamentId);
+  };
+
+  const handleStartTournament = (tournamentId: string) => {
+    navigate(`/tournament/${tournamentId}`);
   };
 
   const handleJoinGame = (gameInfo: gameInfoInterface) => {
@@ -127,6 +135,8 @@ function App() {
     socket.on(GameEvent.START_GAME, handleStartGame);
     socket.on(GameEvent.INIT_GAME, handleInitGame);
     socket.on(GameEvent.JOIN_GAME, handleJoinGame);
+    socket.on(TournamentEvent.INIT_TOURNAMENT, handleInitTournament);
+    socket.on(TournamentEvent.START_TOURNAMENT, handleStartTournament);
 
     //remove all the event listeners  -imp clean-up function
     return () => {
@@ -134,6 +144,8 @@ function App() {
       socket.off(GameEvent.START_GAME, handleStartGame);
       socket.off(GameEvent.INIT_GAME, handleInitGame);
       socket.off(GameEvent.JOIN_GAME, handleJoinGame);
+      socket.off(TournamentEvent.INIT_TOURNAMENT, handleInitTournament);
+      socket.off(TournamentEvent.START_TOURNAMENT, handleStartTournament);
     };
   }, [socket]);
 

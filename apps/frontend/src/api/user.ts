@@ -15,5 +15,6 @@ export const getUserByUsername = async (username: string) => {
     return user;
   } catch (err) {
     console.error(err);
+    return null;
   }
 };

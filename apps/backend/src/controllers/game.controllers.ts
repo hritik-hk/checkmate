@@ -70,3 +70,84 @@ export const handleRandomGame = async (req: IRequest, res: Response) => {
     res.status(500).json({ error: err });
   }
 };
+
+export const getGamesHistory = async (req: IRequest, res: Response) => {
+  try {
+    const username = req.body.username;
+
+    //fetch user
+    const user = await db.user.findFirst({
+      where: {
+        username: username,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (user === null) return res.status(400).json({ msg: "invalid username" });
+
+    //fetch games
+    const games = await db.game.findMany({
+      where: {
+        AND: [
+          {
+            OR: [
+              {
+                blackPlayerId: user.id,
+              },
+              {
+                whitePlayerId: user.id,
+              },
+            ],
+          },
+          {
+            isGameOver: true,
+          },
+        ],
+      },
+      select: {
+        gameType: true,
+        blackPlayer: true,
+        whitePlayer: true,
+        winnerId: true,
+        createdAt: true,
+      },
+    });
+
+    //fetch tournament games
+    const tournamentGames = await db.tournamentGame.findMany({
+      where: {
+        AND: [
+          {
+            OR: [
+              {
+                blackPlayerId: user.id,
+              },
+              {
+                whitePlayerId: user.id,
+              },
+            ],
+          },
+          {
+            isGameOver: true,
+          },
+        ],
+      },
+      select: {
+        gameType: true,
+        blackPlayer: true,
+        whitePlayer: true,
+        winnerId: true,
+        createdAt: true,
+      },
+    });
+
+    const gamesHistory = [...games, ...tournamentGames];
+
+    return res.status(200).json(gamesHistory);
+  } catch (err) {
+    console.log("error at games history controller: ", err);
+    return res.status(500).json({ error: err });
+  }
+};

@@ -4,6 +4,8 @@ import { Response } from "express";
 import { createSingleRoundRobin } from "../utils/helpers.utils.js";
 import { tournamentHandler } from "../index.js";
 import { GameType } from "@prisma/client";
+import { emitSocketEvent } from "../index.js";
+import { TournamentEvent } from "../constants.js";
 
 export const createTournament = async (req: IRequest, res: Response) => {
   try {
@@ -50,7 +52,17 @@ export const createTournament = async (req: IRequest, res: Response) => {
     //add to active tournaments
     await tournamentHandler.addTournament(newTournament.id);
 
-    //To Do: emit socket event tournament start to all participants
+    //To Do: emit tournament init event to all participants
+    for (let i = 0; i < participants.length; i++) {
+      const playerId = participants[i];
+      if (playerId) {
+        emitSocketEvent(
+          playerId,
+          TournamentEvent.INIT_TOURNAMENT,
+          newTournament.id
+        );
+      }
+    }
 
     return res.status(200).json({ newTournament, tournamentGames, rounds });
   } catch (err) {
@@ -245,6 +257,37 @@ export const getFixture = async (req: IRequest, res: Response) => {
     return res.status(200).json(fixture);
   } catch (err) {
     console.log(err);
+    return res.status(500).json({ error: err });
+  }
+};
+
+export const getTournamentHistory = async (req: IRequest, res: Response) => {
+  try {
+    const username = req.body.username;
+
+    //fetch user
+    const user = await db.user.findFirst({
+      where: {
+        username: username,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (user === null) return res.status(400).json({ msg: "invalid user" });
+
+    const tournamentHistory = await db.tournament.findMany({
+      where: {
+        participants: {
+          has: user.id,
+        },
+      },
+    });
+
+    return res.status(200).json(tournamentHistory);
+  } catch (err) {
+    console.log("error at getTournamentHistory controller: ", err);
     return res.status(500).json({ error: err });
   }
 };
