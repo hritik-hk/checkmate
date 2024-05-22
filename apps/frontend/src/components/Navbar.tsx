@@ -4,12 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FaSearch } from "react-icons/fa";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getUserByUsername } from "@/api/user";
 
 export default function Navbar() {
-  const [search, setSearch] = useState<string>("");
+  const navigate = useNavigate();
 
-  function handleSearch() {
-    console.log(search);
+  const [search, setSearch] = useState<string>(""); // username to search
+
+  async function handleSearch() {
+    const user = await getUserByUsername(search);
+
+    if (user === null) {
+      // ToDo: show message on frontend using toast
+      console.log("invalid user");
+    } else {
+      navigate(`/user/${user.username}`);
+    }
+
     setSearch("");
   }
 

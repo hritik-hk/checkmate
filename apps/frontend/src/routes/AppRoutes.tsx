@@ -39,7 +39,7 @@ export default function AppRoutes() {
       />
 
       <Route
-        path="/user"
+        path="/user/:username"
         element={
           <Protected>
             <UserProfile />

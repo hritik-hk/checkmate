@@ -4,7 +4,12 @@ import cookie from "cookie";
 import db from "../configs/database.js";
 import jwt from "jsonwebtoken";
 import { payload } from "../interfaces/common.js";
-import { GameEvent, SocketEvent, TournamentEvent } from "../constants.js";
+import {
+  FriendEvent,
+  GameEvent,
+  SocketEvent,
+  TournamentEvent,
+} from "../constants.js";
 import { gamesHandler, tournamentHandler } from "../index.js";
 
 export default class SocketService {
@@ -72,6 +77,13 @@ export default class SocketService {
     });
   }
 
+  private mountFriendRequestEvent(socket: ISocket) {
+    socket.on(FriendEvent.FRIEND_REQUEST, (request) => {
+      const { receiverId } = request;
+      socket.to(receiverId).emit(FriendEvent.FRIEND_REQUEST, request);
+    });
+  }
+
   public initializeSocketService() {
     const io = this._io;
 
@@ -115,7 +127,7 @@ export default class SocketService {
       } catch (err) {
         console.log(err);
         next(
-          new Error("Something went wrong while connecting to the socketio")
+          new Error("Something went wrong while connecting to websocket server")
         );
       }
     });
@@ -129,6 +141,7 @@ export default class SocketService {
         this.mountJoinGameEvent(socket);
         this.mountJoinTournamentEvent(socket);
         this.mountInitTournamentEvent(socket);
+        this.mountFriendRequestEvent(socket);
 
         socket.on(SocketEvent.DISCONNECT_EVENT, () => {
           console.log("user has disconnected 🚫. userId: " + socket.user?.id);

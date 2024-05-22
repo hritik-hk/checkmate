@@ -50,7 +50,7 @@ export default function Home() {
       fetchGamesHistory(authUser.username);
       fetchTournamentHistory(authUser.username);
     }
-  }, []);
+  }, [authUser]);
 
   return (
     <>
@@ -69,7 +69,15 @@ export default function Home() {
                       {userInfo?.username}
                     </p>
                     <p>
-                      Joined {new Date(userInfo.createdAt).toLocaleDateString()}
+                      Joined{" "}
+                      {new Date(userInfo.createdAt).toLocaleDateString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        }
+                      )}
                     </p>
                   </div>
                   <div className="mt-4">

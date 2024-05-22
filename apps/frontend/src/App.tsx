@@ -2,18 +2,21 @@ import { useEffect } from "react";
 import { useAuth } from "./hooks/auth";
 import { getUrl } from "./utils/helpers";
 import { useSocket } from "./hooks/socket";
-import { GameEvent, TournamentEvent } from "./utils/constant";
+import { FriendEvent, GameEvent, TournamentEvent } from "./utils/constant";
 import { createGame } from "./api/game";
 import { useNavigate } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import { useGame } from "./hooks/game";
 import { gameInfoInterface } from "./interfaces/common";
 import { Chess } from "chess.js";
+import { toast } from "sonner";
+import { declineFriendRequest, addFriendship } from "./api/user";
 
 function App() {
   const { isLoggedIn, setIsLoggedIn, setAuthUser, authUser } = useAuth();
   const { socket } = useSocket();
   const navigate = useNavigate();
+
   const {
     setCurrGameInfo,
     setGameState,
@@ -84,6 +87,29 @@ function App() {
     );
   };
 
+  const handleFriendRequest = (request: any) => {
+    //todo: add to actions
+    toast("Friend Request", {
+      description: `${request.senderUsername} wants to be friends with you.`,
+      action: {
+        label: "Accept",
+        onClick: async () =>
+          await addFriendship({
+            senderId: request.senderId,
+            receiverId: request.receiverId,
+          }),
+      },
+      cancel: {
+        label: "Decline",
+        onClick: async () =>
+          await declineFriendRequest({
+            senderId: request.senderId,
+            receiverId: request.receiverId,
+          }),
+      },
+    });
+  };
+
   useEffect(() => {
     fetch(getUrl("auth/check"), {
       credentials: "include" as RequestCredentials,
@@ -137,6 +163,7 @@ function App() {
     socket.on(GameEvent.JOIN_GAME, handleJoinGame);
     socket.on(TournamentEvent.INIT_TOURNAMENT, handleInitTournament);
     socket.on(TournamentEvent.START_TOURNAMENT, handleStartTournament);
+    socket.on(FriendEvent.FRIEND_REQUEST, handleFriendRequest);
 
     //remove all the event listeners  -imp clean-up function
     return () => {
@@ -146,6 +173,7 @@ function App() {
       socket.off(GameEvent.JOIN_GAME, handleJoinGame);
       socket.off(TournamentEvent.INIT_TOURNAMENT, handleInitTournament);
       socket.off(TournamentEvent.START_TOURNAMENT, handleStartTournament);
+      socket.off(FriendEvent.FRIEND_REQUEST, handleFriendRequest);
     };
   }, [socket]);
 

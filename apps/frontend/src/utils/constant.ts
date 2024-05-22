@@ -26,3 +26,7 @@ export const TournamentEvent = {
   JOIN_TOURNAMENT: "JOIN_TOURNAMENT",
   ROUND_UPDATE: "ROUND_UPDATE",
 } as const;
+
+export const FriendEvent = {
+  FRIEND_REQUEST: "FRIEND_REQUEST",
+};

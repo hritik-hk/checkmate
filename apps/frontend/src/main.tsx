@@ -7,6 +7,7 @@ import { AuthContextProvider } from "./context/AuthContext.tsx";
 import { GameContextProvider } from "./context/GameContext.tsx";
 import { ThemeProvider } from "./context/ThemeContext.tsx";
 import { TournamentContextProvider } from "./context/TournamentContext.tsx";
+import { Toaster } from "@/components/ui/sonner";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <ThemeProvider>
@@ -16,6 +17,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <TournamentContextProvider>
             <GameContextProvider>
               <App />
+              <Toaster />
             </GameContextProvider>
           </TournamentContextProvider>
         </SocketContextProvider>

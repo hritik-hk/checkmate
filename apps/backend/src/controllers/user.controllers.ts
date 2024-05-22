@@ -41,3 +41,83 @@ export const fetchUserByUsername = async (req: Request, res: Response) => {
     return res.status(500).json({ err });
   }
 };
+
+export const createFriendRequest = async (req: IRequest, res: Response) => {
+  try {
+    const { senderId, receiverId } = req.body;
+
+    const request = await db.friendRequest.create({
+      data: {
+        senderId: senderId,
+        receiverId: receiverId,
+      },
+    });
+
+    return res.status(201).json(request);
+  } catch (err) {
+    console.log("error while create friend req: ", err);
+    res.status(500).json({ error: err });
+  }
+};
+
+export const declineFriendRequest = async (req: IRequest, res: Response) => {
+  try {
+    const { senderId, receiverId } = req.body;
+
+    const request = await db.friendRequest.delete({
+      where: {
+        senderId_receiverId: {
+          senderId: senderId,
+          receiverId: receiverId,
+        },
+      },
+    });
+
+    return res.status(200).json(request);
+  } catch (err) {
+    console.log("error declining friend reqquest: ", err);
+    res.status(500).json({ error: err });
+  }
+};
+
+export const addFriendship = async (req: IRequest, res: Response) => {
+  try {
+    const { senderId, receiverId } = req.body;
+
+    // create friend relationship in both directions
+    await db.user.update({
+      where: { id: senderId },
+      data: {
+        friends: {
+          connect: { id: receiverId },
+        },
+      },
+    });
+
+    await db.user.update({
+      where: { id: receiverId },
+      data: {
+        friends: {
+          connect: { id: senderId },
+        },
+      },
+    });
+
+    //delete friendRequest from freindRequest table
+    await db.friendRequest.delete({
+      where: {
+        senderId_receiverId: {
+          senderId: senderId,
+          receiverId: receiverId,
+        },
+      },
+    });
+
+    return res
+      .status(200)
+      .json({ msg: "friend request accepted, friendship added" });
+  } catch (err) {
+    console.log("error accepting friend reqquest: ", err);
+    return res.status(500).json({ error: err });
+  }
+};

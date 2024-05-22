@@ -54,7 +54,7 @@ export const getTournamentHistory = async (username: string) => {
     });
 
     if (!resp.ok) {
-      throw new Error("something went wrong white fetch games history");
+      throw new Error("something went wrong while fetching tournament history");
     }
 
     const data = await resp.json();

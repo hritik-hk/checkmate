@@ -25,7 +25,7 @@ model User {
   password_hash          String
   createdAt              DateTime         @default(now())
   friends                User[]           @relation("friends")
-  friendsRelation        User[]           @relation("friends")
+  friendOf               User[]           @relation("friends")
   gamesAsWhite           Game[]           @relation("GamesAsWhite")
   gamesAsBlack           Game[]           @relation("GamesAsBlack")
   TournamentGamesAsWhite TournamentGame[] @relation("TournamentGamesAsWhite")

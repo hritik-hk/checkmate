@@ -11,6 +11,6 @@ router
   .post("/new", createTournament)
   .post("/points", getPointsTable)
   .post("/fixture", getFixture)
-  .post("history", getTournamentHistory);
+  .post("/history", getTournamentHistory);
 
 export default router;
