@@ -31,7 +31,7 @@ export default async function isAuth(
       });
 
       if (!user) {
-        return res.status(401);
+        return res.sendStatus(401);
       }
       req.user = user;
     } else {

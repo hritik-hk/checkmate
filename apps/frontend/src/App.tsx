@@ -89,6 +89,7 @@ function App() {
 
   const handleFriendRequest = (request: any) => {
     //todo: add to actions
+    console.log(request);
     toast("Friend Request", {
       description: `${request.senderUsername} wants to be friends with you.`,
       action: {

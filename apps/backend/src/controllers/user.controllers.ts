@@ -5,12 +5,12 @@ import db from "../configs/database.js";
 export const fetchLoggedInUser = async (req: IRequest, res: Response) => {
   try {
     if (req.user) {
-      res.status(200).json(req.user);
+      return res.status(200).json(req.user);
     } else {
       throw new Error("your not authorized");
     }
   } catch (err) {
-    res.sendStatus(500).json({ error: err });
+    return res.sendStatus(500).json({ error: err });
   }
 };
 
@@ -27,7 +27,15 @@ export const fetchUserByUsername = async (req: Request, res: Response) => {
         blitz_rating: true,
         rapid_rating: true,
         createdAt: true,
-        friends: true,
+        friends: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            blitz_rating: true,
+            rapid_rating: true,
+          },
+        },
       },
     });
 
@@ -44,11 +52,13 @@ export const fetchUserByUsername = async (req: Request, res: Response) => {
 
 export const createFriendRequest = async (req: IRequest, res: Response) => {
   try {
-    const { senderId, receiverId } = req.body;
+    const { senderUsername, senderId, receiverUsername, receiverId } = req.body;
 
     const request = await db.friendRequest.create({
       data: {
+        senderUsername: senderUsername,
         senderId: senderId,
+        receiverUsername: receiverUsername,
         receiverId: receiverId,
       },
     });
@@ -118,6 +128,23 @@ export const addFriendship = async (req: IRequest, res: Response) => {
       .json({ msg: "friend request accepted, friendship added" });
   } catch (err) {
     console.log("error accepting friend reqquest: ", err);
+    return res.status(500).json({ error: err });
+  }
+};
+
+export const getFriendRequests = async (req: IRequest, res: Response) => {
+  try {
+    const user = req.user;
+
+    const requests = await db.friendRequest.findMany({
+      where: {
+        receiverId: user?.id,
+      },
+    });
+
+    return res.status(200).json(requests);
+  } catch (err) {
+    console.log(err);
     return res.status(500).json({ error: err });
   }
 };

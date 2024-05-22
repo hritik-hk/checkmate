@@ -114,7 +114,12 @@ export default function Home() {
           <div className="mt-7">
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
               <div className="col-span-2">
-                <ActiveEvents />
+                {gamesHistory && tournamentHistory && (
+                  <ActiveEvents
+                    gamesHistory={gamesHistory}
+                    tournamentHistory={tournamentHistory}
+                  />
+                )}
               </div>
               <div>
                 <div className="bg-stone-800 p-5 rounded-md pr-10">

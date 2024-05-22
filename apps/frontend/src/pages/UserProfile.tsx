@@ -14,6 +14,7 @@ import { getUserByUsername } from "@/api/user";
 import { useSocket } from "@/hooks/socket";
 import { FriendEvent } from "@/utils/constant";
 import { createFriendRequest } from "@/api/user";
+import { getGamesHistory } from "@/api/game";
 
 export default function UserProfile() {
   const { authUser } = useAuth();
@@ -21,6 +22,7 @@ export default function UserProfile() {
   const { username } = useParams();
 
   const [userInfo, setUserInfo] = useState<user | null>(null);
+  const [gamesHistory, setGamesHistory] = useState<any>(null);
   const [requestSent, setRequestSent] = useState(false);
 
   const friendList = Array.from({ length: 5 }).map((_, i) => `Friend ${i + 1}`);
@@ -28,8 +30,10 @@ export default function UserProfile() {
   async function sendFriendRequest() {
     if (userInfo && socket && authUser) {
       const resp = await createFriendRequest({
+        senderUsername: authUser.username,
         senderId: authUser.id,
         receiverId: userInfo.id,
+        receiverUsername: userInfo.username,
       });
 
       if (resp) {
@@ -52,9 +56,14 @@ export default function UserProfile() {
       const user = await getUserByUsername(username);
       setUserInfo(user);
     }
+    async function fetchGamesHistory(username: string) {
+      const data = await getGamesHistory(username);
+      setGamesHistory(data);
+    }
 
     if (username) {
       fetchUserInfo(username);
+      fetchGamesHistory(username);
     }
   }, []);
 
@@ -142,12 +151,12 @@ export default function UserProfile() {
                   </TabsList>
                   <TabsContent value="Games">
                     <div className="mt-5">
-                      <GameHistory />
+                      <GameHistory gamesHistory={gamesHistory} />
                     </div>
                   </TabsContent>
                   <TabsContent value="Tournaments">
                     <div className="mt-5">
-                      <GameHistory />
+                      <GameHistory gamesHistory={gamesHistory} />
                     </div>
                   </TabsContent>
                 </Tabs>

@@ -33,8 +33,10 @@ model User {
 }
 
 model FriendRequest {
-  senderId   String
-  receiverId String
+  senderUsername   String
+  senderId         String
+  receiverUsername String
+  receiverId       String
 
   @@id([senderId, receiverId])
 }

@@ -81,3 +81,22 @@ export const addFriendship = async (request: any) => {
     return null;
   }
 };
+
+export const getFriendRequests = async () => {
+  try {
+    const resp = await fetch(getUrl("user/requests"), {
+      credentials: "include",
+    });
+
+    if (!resp.ok) {
+      throw new Error("error fetching friend requests");
+    }
+
+    const data = await resp.json();
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+};

@@ -3,14 +3,19 @@ import checkmateLogo from "../assets/checkmateLogo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FaSearch } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserByUsername } from "@/api/user";
+import ActionCenter from "./ActionCenter";
+import { useAuth } from "@/hooks/auth";
+import { getFriendRequests } from "@/api/user";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const { authUser } = useAuth();
 
   const [search, setSearch] = useState<string>(""); // username to search
+  const [requests, setRequests] = useState([]);
 
   async function handleSearch() {
     const user = await getUserByUsername(search);
@@ -24,6 +29,17 @@ export default function Navbar() {
 
     setSearch("");
   }
+
+  useEffect(() => {
+    async function fetchFriendRequests() {
+      const data = await getFriendRequests();
+      setRequests(data);
+    }
+
+    if (authUser) {
+      fetchFriendRequests();
+    }
+  }, [authUser]);
 
   return (
     <>
@@ -52,6 +68,11 @@ export default function Navbar() {
                   Home
                 </Link>
               </div>
+
+              <div className="mr-4">
+                <ActionCenter friendRequests={requests} />
+              </div>
+
               <div className="bg-white text-black p-2 rounded-md">
                 <Link to="/user" className=" py-2 px-3 rounded">
                   Logout

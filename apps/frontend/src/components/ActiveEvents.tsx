@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GameHistory } from "./GamesHistory";
 
-export function ActiveEvents() {
+export function ActiveEvents({ gamesHistory, tournamentHistory }: any) {
   return (
     <Tabs defaultValue="Games">
       <TabsList className="grid w-full grid-cols-2 h-14">
@@ -17,7 +17,7 @@ export function ActiveEvents() {
           <p className="text-xl py-4">No ongoing games...</p>
         </div>
         <div className="mt-5">
-          <GameHistory />
+          <GameHistory gamesHistory={gamesHistory} />
         </div>
       </TabsContent>
       <TabsContent value="Tournaments">
