@@ -84,12 +84,31 @@ export const addFriendship = async (request: any) => {
 
 export const getFriendRequests = async () => {
   try {
-    const resp = await fetch(getUrl("user/requests"), {
+    const resp = await fetch(getUrl("user/recieved_requests"), {
       credentials: "include",
     });
 
     if (!resp.ok) {
-      throw new Error("error fetching friend requests");
+      throw new Error("error fetching recieved friend requests");
+    }
+
+    const data = await resp.json();
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+};
+
+export const getSentRequests = async () => {
+  try {
+    const resp = await fetch(getUrl("user/sent_requests"), {
+      credentials: "include",
+    });
+
+    if (!resp.ok) {
+      throw new Error("error fetching sent friend requests");
     }
 
     const data = await resp.json();

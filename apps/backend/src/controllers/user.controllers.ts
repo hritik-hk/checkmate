@@ -132,13 +132,30 @@ export const addFriendship = async (req: IRequest, res: Response) => {
   }
 };
 
-export const getFriendRequests = async (req: IRequest, res: Response) => {
+export const getRecievedFriendRequests = async (req: IRequest, res: Response) => {
   try {
     const user = req.user;
 
     const requests = await db.friendRequest.findMany({
       where: {
         receiverId: user?.id,
+      },
+    });
+
+    return res.status(200).json(requests);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err });
+  }
+};
+
+export const getSentFriendRequests = async (req: IRequest, res: Response) => {
+  try {
+    const user = req.user;
+
+    const requests = await db.friendRequest.findMany({
+      where: {
+        senderId: user?.id,
       },
     });
 

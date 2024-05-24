@@ -2,7 +2,6 @@ import Navbar from "@/components/Navbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GameHistory } from "../components/GamesHistory";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { Separator } from "@radix-ui/react-separator";
 import { useAuth } from "@/hooks/auth";
 import blitz from "../assets/blitz.svg";
 import clock from "../assets/clock.svg";
@@ -15,6 +14,7 @@ import { useSocket } from "@/hooks/socket";
 import { FriendEvent } from "@/utils/constant";
 import { createFriendRequest } from "@/api/user";
 import { getGamesHistory } from "@/api/game";
+import { getSentRequests, getFriendRequests } from "@/api/user";
 
 export default function UserProfile() {
   const { authUser } = useAuth();
@@ -23,9 +23,33 @@ export default function UserProfile() {
 
   const [userInfo, setUserInfo] = useState<user | null>(null);
   const [gamesHistory, setGamesHistory] = useState<any>(null);
+  const [sentRequestsInfo, setSentRequestsInfo] = useState<any>(null);
+  const [receivedRequestsInfo, setReceivedRequestsInfo] = useState<any>(null);
   const [requestSent, setRequestSent] = useState(false);
+  const [requestReceived, setRequestReceived] = useState(false);
+  const [friend, setFriend] = useState(false);
 
-  const friendList = Array.from({ length: 5 }).map((_, i) => `Friend ${i + 1}`);
+  function getTotalBlitzGames() {
+    let count = 0;
+    gamesHistory.forEach((game: any) => {
+      if (game.gameType === "BLITZ") {
+        count++;
+      }
+    });
+
+    return count;
+  }
+
+  function getTotalRapidGames() {
+    let count = 0;
+    gamesHistory.forEach((game: any) => {
+      if (game.gameType === "RAPID") {
+        count++;
+      }
+    });
+
+    return count;
+  }
 
   async function sendFriendRequest() {
     if (userInfo && socket && authUser) {
@@ -65,12 +89,65 @@ export default function UserProfile() {
       fetchUserInfo(username);
       fetchGamesHistory(username);
     }
-  }, []);
+  }, [username]);
+
+  useEffect(() => {
+    async function fetchSentRequests() {
+      const sentRequests = await getSentRequests();
+      setSentRequestsInfo(sentRequests);
+    }
+
+    async function fetchFriendRequests() {
+      const receivedRequests = await getFriendRequests();
+      setReceivedRequestsInfo(receivedRequests);
+    }
+
+    if (userInfo && authUser) {
+      //check if the user is friends with it
+      let isFriend = false;
+      for (let i = 0; i < userInfo.friends.length; i++) {
+        const friend = userInfo.friends[i];
+        if (friend.id === authUser.id) {
+          setFriend(true);
+          isFriend = true;
+          break;
+        }
+      }
+
+      //if not friend then check friend request status
+      if (!isFriend) {
+        //check for sent requests
+        fetchSentRequests();
+        //check for recieved request
+        fetchFriendRequests();
+      }
+    }
+  }, [userInfo, authUser]);
+
+  useEffect(() => {
+    if (sentRequestsInfo) {
+      for (let i = 0; i < sentRequestsInfo.length; i++) {
+        if (sentRequestsInfo[i].receiverId === userInfo?.id) {
+          setRequestSent(true);
+          break;
+        }
+      }
+    }
+
+    if (receivedRequestsInfo) {
+      for (let i = 0; i < receivedRequestsInfo.length; i++) {
+        if (receivedRequestsInfo[i].senderId == userInfo?.id) {
+          setRequestReceived(true);
+          break;
+        }
+      }
+    }
+  }, [sentRequestsInfo, receivedRequestsInfo, userInfo]);
 
   return (
     <>
       <Navbar />
-      {userInfo && (
+      {authUser && userInfo && gamesHistory && (
         <div className=" w-100 min-h-[1200px] bg-stone-700 pt-10 px-64">
           <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
             <div className="col-span-2">
@@ -122,20 +199,30 @@ export default function UserProfile() {
                         </span>
                       </p>
                     </div>
-                    <div>
-                      {requestSent ? (
-                        <div className="mt-3 text-lg p-2 rounded-md bg-gray-300 text-black font-semibold w-fit">
-                          REQUEST SENT
-                        </div>
-                      ) : (
-                        <div
-                          className="mt-3 text-lg p-2 rounded-md bg-gray-300 text-black font-semibold cursor-pointer w-fit"
-                          onClick={sendFriendRequest}
-                        >
-                          Send friend request
-                        </div>
-                      )}
-                    </div>
+                    {userInfo.id !== authUser.id && (
+                      <div>
+                        {friend ? (
+                          <div className="mt-3 text-lg p-2 rounded-md bg-gray-300 text-black font-semibold w-fit">
+                            You're Friends
+                          </div>
+                        ) : requestReceived ? (
+                          <div className="mt-3 text-lg p-2 rounded-md bg-gray-300 text-black font-semibold w-fit">
+                            Check Actions for Friend Request
+                          </div>
+                        ) : requestSent ? (
+                          <div className="mt-3 text-lg p-2 rounded-md bg-gray-300 text-black font-semibold w-fit">
+                            Friend Request Sent
+                          </div>
+                        ) : (
+                          <div
+                            className="mt-3 text-lg p-2 rounded-md bg-gray-300 text-black font-semibold cursor-pointer w-fit"
+                            onClick={sendFriendRequest}
+                          >
+                            Send a Friend Request
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -162,32 +249,29 @@ export default function UserProfile() {
                 </Tabs>
               </div>
             </div>
+
             <div>
               <div className="bg-stone-800 p-5 rounded-md pr-10">
                 <h3 className="text-2xl">Stats</h3>
                 <div className="flex justify-between">
                   <span>Total Games</span>
-                  <span>74</span>
+                  <span>{gamesHistory.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Blitz Games</span>
-                  <span>4</span>
+                  <span>{getTotalBlitzGames()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Rapid Games</span>
-                  <span>64</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Total Games</span>
-                  <span>74</span>
+                  <span>{getTotalRapidGames()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Blitz Rating</span>
-                  <span>455</span>
+                  <span>{userInfo.blitz_rating}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Rapid Rating</span>
-                  <span>74</span>
+                  <span>{userInfo.rapid_rating}</span>
                 </div>
               </div>
 
@@ -196,15 +280,20 @@ export default function UserProfile() {
                   <ScrollArea className=" border min-h-44">
                     <div className="p-4">
                       <h4 className="mb-4 text-xl font-semibold leading-none">
-                        Friends ({friendList.length})
+                        Friends ({userInfo.friends.length})
                       </h4>
-                      {friendList.map((friend) => (
-                        <>
-                          <div key={friend} className="text-md font-medium">
-                            {friend}
-                          </div>
-                          <Separator className="my-2" />
-                        </>
+                      {userInfo.friends.map((friend: any) => (
+                        <div key={friend}>
+                          <span className="text-md font-medium mx-2">
+                            {friend.username}
+                          </span>
+                          <span className="text-sm font-medium mx-2">
+                            BLITZ({friend.blitz_rating})
+                          </span>
+                          <span className="text-sm font-medium">
+                            RAPID ({friend.rapid_rating})
+                          </span>
+                        </div>
                       ))}
                     </div>
                   </ScrollArea>

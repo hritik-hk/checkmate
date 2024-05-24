@@ -5,7 +5,6 @@ import blitz from "../assets/blitz.svg";
 import clock from "../assets/clock.svg";
 import { useAuth } from "@/hooks/auth";
 import { ActiveEvents } from "@/components/ActiveEvents";
-import { Separator } from "@radix-ui/react-separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import avatar from "../assets/avatar.svg";
 import PlayStranger from "@/components/PlayStranger";
@@ -22,7 +21,27 @@ export default function Home() {
   const [gamesHistory, setGamesHistory] = useState<any>(null);
   const [tournamentHistory, setTournamentHistory] = useState<any>(null);
 
-  const friendList = Array.from({ length: 5 }).map((_, i) => `Friend ${i + 1}`);
+  function getTotalBlitzGames() {
+    let count = 0;
+    gamesHistory.forEach((game: any) => {
+      if (game.gameType === "BLITZ") {
+        count++;
+      }
+    });
+
+    return count;
+  }
+
+  function getTotalRapidGames() {
+    let count = 0;
+    gamesHistory.forEach((game: any) => {
+      if (game.gameType === "RAPID") {
+        count++;
+      }
+    });
+
+    return count;
+  }
 
   useEffect(() => {
     async function fetchUserInfo(username: string) {
@@ -112,65 +131,66 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-7">
-            <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
-              <div className="col-span-2">
-                {gamesHistory && tournamentHistory && (
+            {gamesHistory && tournamentHistory && (
+              <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
+                <div className="col-span-2">
                   <ActiveEvents
                     gamesHistory={gamesHistory}
                     tournamentHistory={tournamentHistory}
                   />
-                )}
-              </div>
-              <div>
-                <div className="bg-stone-800 p-5 rounded-md pr-10">
-                  <h3 className="text-2xl">Stats</h3>
-                  <div className="flex justify-between">
-                    <span>Total Games</span>
-                    <span>74</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Blitz Games</span>
-                    <span>4</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Rapid Games</span>
-                    <span>64</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Total Games</span>
-                    <span>74</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Blitz Rating</span>
-                    <span>455</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Rapid Rating</span>
-                    <span>74</span>
-                  </div>
                 </div>
+                <div>
+                  <div className="bg-stone-800 p-5 rounded-md pr-10">
+                    <h3 className="text-2xl">Stats</h3>
+                    <div className="flex justify-between">
+                      <span>Total Games</span>
+                      <span>{gamesHistory.length}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Blitz Games</span>
+                      <span>{getTotalBlitzGames()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Rapid Games</span>
+                      <span>{getTotalRapidGames()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Blitz Rating</span>
+                      <span>{userInfo.blitz_rating}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Rapid Rating</span>
+                      <span>{userInfo.rapid_rating}</span>
+                    </div>
+                  </div>
 
-                <div className="mt-5 bg-stone-800 rounded-md">
-                  <ScrollArea>
-                    <ScrollArea className=" border min-h-44">
-                      <div className="p-4">
-                        <h4 className="mb-4 text-xl font-semibold leading-none">
-                          Friends ({friendList.length})
-                        </h4>
-                        {friendList.map((friend) => (
-                          <>
-                            <div key={friend} className="text-md font-medium">
-                              {friend}
+                  <div className="mt-5 bg-stone-800 rounded-md">
+                    <ScrollArea>
+                      <ScrollArea className=" border min-h-44">
+                        <div className="p-4">
+                          <h4 className="mb-4 text-xl font-semibold leading-none">
+                            Friends ({userInfo.friends.length})
+                          </h4>
+                          {userInfo.friends.map((friend: any) => (
+                            <div key={friend}>
+                              <span className="text-md font-medium mx-2">
+                                {friend.username}
+                              </span>
+                              <span className="text-sm font-medium mx-2">
+                                BLITZ({friend.blitz_rating})
+                              </span>
+                              <span className="text-sm font-medium">
+                                RAPID ({friend.rapid_rating})
+                              </span>
                             </div>
-                            <Separator className="my-2" />
-                          </>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
                     </ScrollArea>
-                  </ScrollArea>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}

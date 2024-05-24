@@ -5,7 +5,8 @@ import {
   createFriendRequest,
   declineFriendRequest,
   addFriendship,
-  getFriendRequests,
+  getRecievedFriendRequests,
+  getSentFriendRequests,
 } from "../controllers/user.controllers.js";
 const router = express.Router();
 
@@ -14,7 +15,8 @@ router
   .post("/friend_request", createFriendRequest)
   .post("/decline_friendship", declineFriendRequest)
   .post("/add_friendship", addFriendship)
-  .get("/requests", getFriendRequests)
+  .get("/recieved_requests", getRecievedFriendRequests)
+  .get("/sent_requests", getSentFriendRequests)
   .get("/:username", fetchUserByUsername);
 
 export default router;
