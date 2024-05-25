@@ -13,6 +13,7 @@ import { getUserByUsername } from "@/api/user";
 import { getGamesHistory } from "@/api/game";
 import { getTournamentHistory } from "@/api/tournament";
 import { IUser } from "@/interfaces/common";
+import Connecting from "@/components/Connecting";
 
 export default function Home() {
   const { authUser } = useAuth();
@@ -20,6 +21,7 @@ export default function Home() {
   const [userInfo, setUserInfo] = useState<IUser | null>(null);
   const [gamesHistory, setGamesHistory] = useState<any>(null);
   const [tournamentHistory, setTournamentHistory] = useState<any>(null);
+  const [connecting, setConnecting] = useState<boolean>(false);
 
   function getTotalBlitzGames() {
     let count = 0;
@@ -125,7 +127,7 @@ export default function Home() {
                 <PlayFriends userFriends={userInfo.friends} />
               </div>
               <div className="my-3">
-                <PlayStranger />
+                <PlayStranger setConnecting={setConnecting} />
               </div>
               <CreateTournament userFriends={userInfo.friends} />
             </div>
@@ -194,6 +196,7 @@ export default function Home() {
           </div>
         </div>
       )}
+      <Connecting connecting={connecting} setConnecting={setConnecting} />
     </>
   );
 }

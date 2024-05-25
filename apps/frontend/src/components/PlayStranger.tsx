@@ -14,15 +14,24 @@ import rapid from "../assets/clock.svg";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function PlayStranger() {
-  const [gameType, setGameType] = useState<string | null>(null);
+export default function PlayStranger({
+  setConnecting,
+}: {
+  setConnecting: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  const [game, setGame] = useState<{
+    gameType: string;
+    gameDuration: number;
+  } | null>(null);
 
   async function handleRandomGame() {
     try {
-      if (gameType) {
-        const data = await startRandomGame(gameType);
+      if (game) {
+        const data = await startRandomGame(game);
+        setConnecting(true);
         if (data === null) {
           toast.error("Something went wront, try again!");
+          setConnecting(false);
         }
       }
     } catch (err) {
@@ -49,11 +58,13 @@ export default function PlayStranger() {
           <p
             className="p-2 rounded-md"
             style={
-              gameType === "RAPID"
+              game?.gameType === "RAPID"
                 ? { border: "2px solid yellow" }
                 : { border: "none" }
             }
-            onClick={() => setGameType("RAPID")}
+            onClick={() =>
+              setGame({ gameType: "RAPID", gameDuration: 10 * 60000 })
+            } // 10 min RAPID
           >
             <span className="mr-1">
               <img className="w-10 inline-block" src={rapid} alt="" />
@@ -63,11 +74,13 @@ export default function PlayStranger() {
           <p
             className="p-2 rounded-md"
             style={
-              gameType === "BLITZ"
+              game?.gameType === "BLITZ"
                 ? { border: "2px solid yellow" }
                 : { border: "none" }
             }
-            onClick={() => setGameType("BLITZ")}
+            onClick={
+              () => setGame({ gameType: "BLITZ", gameDuration: 5 * 60000 }) // 5min BLITZ
+            }
           >
             <span className="m-1">
               <img className="w-8 inline-block" src={blitz} alt="" />

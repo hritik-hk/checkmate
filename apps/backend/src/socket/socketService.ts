@@ -11,6 +11,8 @@ import {
   TournamentEvent,
 } from "../constants.js";
 import { gamesHandler, tournamentHandler } from "../index.js";
+import { randomGame } from "../game/randomGameManager.js";
+import gameManager from "../game/gameManager.js";
 
 export default class SocketService {
   private _io: Server;
@@ -84,6 +86,12 @@ export default class SocketService {
     });
   }
 
+  private mountCancelRandomGame(socket: ISocket) {
+    socket.on(GameEvent.CANCEL_RANDOM, (userId) => {
+      randomGame.cancelGameRequest(userId);
+    });
+  }
+
   public initializeSocketService() {
     const io = this._io;
 
@@ -142,6 +150,7 @@ export default class SocketService {
         this.mountJoinTournamentEvent(socket);
         this.mountInitTournamentEvent(socket);
         this.mountFriendRequestEvent(socket);
+        this.mountCancelRandomGame(socket);
 
         socket.on(SocketEvent.DISCONNECT_EVENT, () => {
           console.log("user has disconnected 🚫. userId: " + socket.user?.id);

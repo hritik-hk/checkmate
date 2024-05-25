@@ -14,6 +14,7 @@ export const GameEvent = {
   MOVE_UPDATE_EVENT: "MOVE_UPDATE_EVENT",
   JOIN_GAME: "JOIN_GAME",
   END_GAME: "END_GAME",
+  CANCEL_RANDOM: "CANCEL_RANDOM",
 } as const;
 
 export const TournamentEvent = {

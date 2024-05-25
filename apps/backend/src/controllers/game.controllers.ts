@@ -60,7 +60,6 @@ export const createNewGame = async (req: IRequest, res: Response) => {
 export const handleRandomGame = async (req: IRequest, res: Response) => {
   try {
     if (req.user) {
-      const gameType = req.body.gameType;
       await randomGame.addPlayer(req, req.user);
       res.status(200).json({ msg: "request successful" });
     } else {
