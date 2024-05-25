@@ -7,19 +7,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
 import { useSocket } from "@/hooks/socket";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GameEvent } from "../utils/constant";
 import { getUserByUsername } from "../api/user";
 import { Button } from "./ui/button";
 import friend from "../assets/friend.svg";
-import { user } from "@/interfaces/common";
+import { IFriend, IUser } from "@/interfaces/common";
+import ChooseFriend from "./ChooseFriend";
+import { toast } from "sonner";
 
-export function PlayFriends() {
-  const navigate = useNavigate();
+export function PlayFriends({ userFriends }: { userFriends: IFriend[] }) {
   const { socket } = useSocket();
 
   const [game, setGame] = useState<{
@@ -27,19 +25,21 @@ export function PlayFriends() {
     gameDuration: number;
   } | null>(null);
 
-  const [friendUsername, setFriendUsername] = useState<string | null>(null);
-  const [opponentUser, setOpponentUser] = useState<user | null>(null);
+  const [friendUsername, setFriendUsername] = useState<string>("");
+  const [opponentUser, setOpponentUser] = useState<IUser | null>(null);
 
   const options = [
     {
-      label: "BLITZ",
+      label: "⚡BLITZ",
+      gameType: "BLITZ",
       value: [
         { label: "3 min", value: 3 * 60000 },
         { label: "5 min", value: 5 * 60000 },
       ],
     },
     {
-      label: "RAPID",
+      label: "⌛RAPID",
+      gameType: "RAPID",
       value: [
         { label: "10 min", value: 10 * 60000 },
         { label: "30 min", value: 30 * 60000 },
@@ -48,7 +48,7 @@ export function PlayFriends() {
   ];
 
   async function handleSearch() {
-    if (friendUsername === null) return;
+    if (friendUsername === "") return;
 
     console.log(friendUsername);
 
@@ -62,16 +62,20 @@ export function PlayFriends() {
   }
 
   function handlePlay() {
-    if (opponentUser) {
+    if (opponentUser && game) {
       socket?.emit(GameEvent.GAME_REQUEST, opponentUser.id, game);
+    } else {
+      toast.error("Either Game-Type or Friend not selected !");
     }
   }
-
-  const friendList = Array.from({ length: 5 }).map((_, i) => `Friend ${i + 1}`);
 
   function handlegame(gameType: string, gameDuration: number) {
     setGame({ gameType, gameDuration });
   }
+
+  useEffect(() => {
+    handleSearch();
+  }, [friendUsername]);
 
   return (
     <Dialog>
@@ -103,7 +107,9 @@ export function PlayFriends() {
                             ? { border: "2px solid yellow" }
                             : { border: "none" }
                         }
-                        onClick={() => handlegame(type.label, duration.value)}
+                        onClick={() =>
+                          handlegame(type.gameType, duration.value)
+                        }
                       >
                         {duration.label}
                       </span>
@@ -119,7 +125,7 @@ export function PlayFriends() {
         <div className="relative">
           <Input
             className="h-12 text-md"
-            placeholder="Search by email or username"
+            placeholder="Search by username"
             onChange={(e: any) => setFriendUsername(e.target.value)}
           ></Input>
           <Button
@@ -129,23 +135,12 @@ export function PlayFriends() {
             search
           </Button>
         </div>
-        <ScrollArea className="">
-          <ScrollArea className="rounded-md border h-40">
-            <div className="p-4">
-              <h4 className="mb-4 text-xl font-semibold leading-none">
-                Friends ({friendList.length})
-              </h4>
-              {friendList.map((friend) => (
-                <>
-                  <div key={friend} className="text-md font-medium">
-                    {friend}
-                  </div>
-                  <Separator className="my-2" />
-                </>
-              ))}
-            </div>
-          </ScrollArea>
-        </ScrollArea>
+
+        <ChooseFriend
+          userFriends={userFriends}
+          friendUsername={friendUsername}
+          setFriendUsername={setFriendUsername}
+        />
 
         <DialogFooter>
           <Button onClick={handlePlay}>

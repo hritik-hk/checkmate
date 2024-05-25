@@ -10,7 +10,6 @@ import { TournamentEvent } from "../constants.js";
 export const createTournament = async (req: IRequest, res: Response) => {
   try {
     const participants: string[] = req.body?.participants || [];
-    const name = req.body.name;
     const numOfRounds =
       participants.length % 2 === 0
         ? participants.length - 1
@@ -27,7 +26,6 @@ export const createTournament = async (req: IRequest, res: Response) => {
 
     const newTournament = await db.tournament.create({
       data: {
-        name: name,
         participants: participants,
         totalRounds: numOfRounds,
       },

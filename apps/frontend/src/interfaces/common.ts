@@ -107,14 +107,22 @@ export interface TournamentContextInterface {
   setOngoingTournament: Dispatch<React.SetStateAction<string | null>>;
 }
 
-export interface user {
+export interface IFriend {
+  id: string;
+  username: string;
+  email: string;
+  blitz_rating: number;
+  rapid_rating: number;
+}
+
+export interface IUser {
   id: string;
   username: string;
   email: string;
   blitz_rating: number;
   rapid_rating: number;
   createdAt: number;
-  friends: any;
+  friends: IFriend[];
 }
 
 export interface moveType {

@@ -59,7 +59,6 @@ model Game {
 
 model Tournament {
   id              String           @id @default(uuid())
-  name            String           @unique
   participants    String[]
   totalRounds     Int
   roundsOver      Int              @default(0)

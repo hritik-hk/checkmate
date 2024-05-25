@@ -64,3 +64,32 @@ export const getTournamentHistory = async (username: string) => {
     return null;
   }
 };
+
+export const createTournament = async ({
+  participants,
+  gameType,
+  gameDuration,
+}: {
+  participants: string[];
+  gameType: string;
+  gameDuration: number;
+}) => {
+  try {
+    const response = await fetch(getUrl(`tournament/new`), {
+      credentials: "include",
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ participants, gameType, gameDuration }),
+    });
+
+    if (!response.ok) {
+      throw new Error("something went wrong while creating tournament");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};

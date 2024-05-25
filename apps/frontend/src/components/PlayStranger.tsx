@@ -12,13 +12,19 @@ import { startRandomGame } from "@/api/game";
 import blitz from "../assets/blitz.svg";
 import rapid from "../assets/clock.svg";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function PlayStranger() {
   const [gameType, setGameType] = useState<string | null>(null);
 
   async function handleRandomGame() {
     try {
-      await startRandomGame();
+      if (gameType) {
+        const data = await startRandomGame(gameType);
+        if (data === null) {
+          toast.error("Something went wront, try again!");
+        }
+      }
     } catch (err) {
       console.log(err);
     }

@@ -23,11 +23,15 @@ export const createGame = async (data: any) => {
   }
 };
 
-export const startRandomGame = async () => {
+export const startRandomGame = async (gameType: string) => {
   try {
-    const resp = await fetch(getUrl("game/random"), {
+    const resp = await fetch(getUrl(`game/random`), {
       credentials: "include",
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ gameType }),
     });
+
     if (!resp.ok) {
       throw new Error("some error occurred, try again");
     }

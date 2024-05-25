@@ -12,12 +12,12 @@ import { useEffect, useState } from "react";
 import { getUserByUsername } from "@/api/user";
 import { getGamesHistory } from "@/api/game";
 import { getTournamentHistory } from "@/api/tournament";
-import { user } from "@/interfaces/common";
+import { IUser } from "@/interfaces/common";
 
 export default function Home() {
   const { authUser } = useAuth();
 
-  const [userInfo, setUserInfo] = useState<user | null>(null);
+  const [userInfo, setUserInfo] = useState<IUser | null>(null);
   const [gamesHistory, setGamesHistory] = useState<any>(null);
   const [tournamentHistory, setTournamentHistory] = useState<any>(null);
 
@@ -122,12 +122,12 @@ export default function Home() {
             </div>
             <div className="text-white">
               <div>
-                <PlayFriends />
+                <PlayFriends userFriends={userInfo.friends} />
               </div>
               <div className="my-3">
                 <PlayStranger />
               </div>
-              <CreateTournament />
+              <CreateTournament userFriends={userInfo.friends} />
             </div>
           </div>
           <div className="mt-7">
