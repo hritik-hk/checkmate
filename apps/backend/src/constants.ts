@@ -26,4 +26,11 @@ export const TournamentEvent = {
 
 export const FriendEvent = {
   FRIEND_REQUEST: "FRIEND_REQUEST",
-};
+} as const;
+
+export const GameCategory = {
+  TOURNAMENT_GAME: "TOURNAMENT_GAME",
+  NORMAL_GAME: "NORMAL_GAME",
+} as const;
+
+export const FACTOR = 32;

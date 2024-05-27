@@ -1,6 +1,6 @@
 import { IRound } from "../interfaces/common.js";
 import { emitSocketEvent } from "../index.js";
-import { TournamentEvent, GameEvent } from "../constants.js";
+import { TournamentEvent, GameEvent, GameCategory } from "../constants.js";
 import { Queue } from "@datastructures-js/queue";
 import { gamesHandler } from "../index.js";
 
@@ -22,7 +22,7 @@ class Tournament {
 
       roundGames?.forEach((game) => {
         //add to active games
-        gamesHandler.addGame(game);
+        gamesHandler.addGame(game, GameCategory.TOURNAMENT_GAME);
         // logic to emit start_game socket event to both players
         emitSocketEvent(game.blackPlayerId, GameEvent.INIT_GAME, game.id);
         emitSocketEvent(game.whitePlayerId, GameEvent.INIT_GAME, game.id);
@@ -49,7 +49,7 @@ class Tournament {
 
       roundGames?.forEach((game) => {
         //add to active games
-        gamesHandler.addGame(game);
+        gamesHandler.addGame(game, GameCategory.TOURNAMENT_GAME);
         // logic to emit start_game socket event to both players
         emitSocketEvent(game.blackPlayerId, GameEvent.INIT_GAME, game.id);
         emitSocketEvent(game.whitePlayerId, GameEvent.INIT_GAME, game.id);

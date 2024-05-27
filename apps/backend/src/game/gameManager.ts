@@ -10,15 +10,21 @@ class gameManager {
     this.activeGames = new Map<string, GameState>();
   }
 
-  public addGame(game: IGame | ITournamentGame) {
+  public addGame(game: IGame | ITournamentGame, gameCategory: string) {
     //create the new game
     const newGame = new GameState(
       game.id,
       game.whitePlayerId,
       game.blackPlayerId,
-      game.gameDuration
+      game.gameDuration,
+      game.gameType,
+      gameCategory
     );
     this.activeGames.set(game.id, newGame);
+  }
+
+  public removeGame(gameId: string) {
+    this.activeGames.delete(gameId);
   }
 
   public getGame(gameId: string) {

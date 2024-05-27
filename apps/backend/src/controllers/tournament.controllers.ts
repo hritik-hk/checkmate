@@ -3,18 +3,13 @@ import { IRequest } from "../interfaces/common.js";
 import { Response } from "express";
 import { createSingleRoundRobin } from "../utils/helpers.utils.js";
 import { tournamentHandler } from "../index.js";
-import { GameType } from "@prisma/client";
+import { GameResult, GameType, Status } from "@prisma/client";
 import { emitSocketEvent } from "../index.js";
 import { TournamentEvent } from "../constants.js";
 
 export const createTournament = async (req: IRequest, res: Response) => {
   try {
     const participants: string[] = req.body?.participants || [];
-    const numOfRounds =
-      participants.length % 2 === 0
-        ? participants.length - 1
-        : participants.length;
-
     const gameType = req.body?.gameType;
     const gameDuration = req.body.gameDuration;
 
@@ -27,7 +22,7 @@ export const createTournament = async (req: IRequest, res: Response) => {
     const newTournament = await db.tournament.create({
       data: {
         participants: participants,
-        totalRounds: numOfRounds,
+        status: Status.IN_PROGRESS,
       },
     });
 
@@ -102,7 +97,7 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
             {
               tournamentId: tournamentId,
               winnerId: player,
-              isGameOver: true,
+              status: Status.COMPLETED,
             },
             {
               AND: [
@@ -118,8 +113,7 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
                 },
                 {
                   tournamentId: tournamentId,
-                  isDraw: true,
-                  isGameOver: true,
+                  status: Status.COMPLETED,
                 },
               ],
             },
@@ -127,7 +121,7 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
         },
         select: {
           id: true,
-          isDraw: true,
+          result: true,
           gameType: true,
         },
       });
@@ -149,7 +143,7 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
       //calulate point
       let point = 0;
       for (let i = 0; i < games.length; i++) {
-        if (games[i]?.isDraw) {
+        if (games[i]?.result === GameResult.DRAW) {
           point += 0.5;
         } else point++;
       }

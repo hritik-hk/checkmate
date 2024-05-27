@@ -42,48 +42,45 @@ model FriendRequest {
 }
 
 model Game {
-  id            String     @id @default(uuid())
+  id            String      @id @default(uuid())
   whitePlayerId String
   blackPlayerId String
-  status        GameStatus
+  result        GameResult?
+  status        Status
   gameType      GameType
   gameDuration  Int
   winnerId      String?
-  isDraw        Boolean    @default(false)
-  isGameOver    Boolean    @default(false)
   moves         String[] //for now let it be strings
-  createdAt     DateTime   @default(now())
-  whitePlayer   User       @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
-  blackPlayer   User       @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
+  createdAt     DateTime    @default(now())
+  whitePlayer   User        @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
+  blackPlayer   User        @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
 }
 
 model Tournament {
   id              String           @id @default(uuid())
   participants    String[]
-  totalRounds     Int
-  roundsOver      Int              @default(0)
+  status          Status
   TournamentGames TournamentGame[]
   Rounds          Round[]
 }
 
 model TournamentGame {
-  id            String     @id @default(uuid())
+  id            String      @id @default(uuid())
   whitePlayerId String
   blackPlayerId String
   tournamentId  String
-  status        GameStatus
+  result        GameResult?
+  status        Status
   gameType      GameType
   gameDuration  Int
   winnerId      String?
-  isDraw        Boolean    @default(false)
-  isGameOver    Boolean    @default(false)
   moves         String[] //for now let it be strings
   roundId       String
-  tournament    Tournament @relation(fields: [tournamentId], references: [id])
-  round         Round      @relation(fields: [roundId], references: [id])
-  createdAt     DateTime   @default(now())
-  whitePlayer   User       @relation("TournamentGamesAsWhite", fields: [whitePlayerId], references: [id])
-  blackPlayer   User       @relation("TournamentGamesAsBlack", fields: [blackPlayerId], references: [id])
+  createdAt     DateTime    @default(now())
+  tournament    Tournament  @relation(fields: [tournamentId], references: [id])
+  round         Round       @relation(fields: [roundId], references: [id])
+  whitePlayer   User        @relation("TournamentGamesAsWhite", fields: [whitePlayerId], references: [id])
+  blackPlayer   User        @relation("TournamentGamesAsBlack", fields: [blackPlayerId], references: [id])
 }
 
 model Round {
@@ -97,13 +94,19 @@ model Round {
   tournament   Tournament       @relation(fields: [tournamentId], references: [id])
 }
 
-enum GameStatus {
-  IN_PROGRESS
-  COMPLETED
+enum GameResult {
   ABANDONED
+  DRAW
+  CHECKMATE
+  TIMES_UP
 }
 
 enum GameType {
   RAPID
   BLITZ
+}
+
+enum Status {
+  IN_PROGRESS
+  COMPLETED
 }

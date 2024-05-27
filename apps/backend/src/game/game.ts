@@ -2,7 +2,11 @@ import { Chess } from "chess.js";
 import { Square } from "chess.js";
 import { checkPromotion } from "../utils/helpers.utils.js";
 import { emitSocketEvent } from "../index.js";
-import { GameEvent } from "../constants.js";
+import { GameEvent, GameCategory, FACTOR } from "../constants.js";
+import db from "../configs/database.js";
+import { GameResult, GameType, Status } from "@prisma/client";
+import { calExpectedScore, calNewRating } from "../utils/helpers.utils.js";
+import { gamesHandler } from "../index.js";
 
 //TO DO : make common interface exports from packages folder
 export interface move {
@@ -16,6 +20,8 @@ class GameState {
   private _gameState: Chess;
   private _whitePlayerId: string;
   private _blackPlayerId: string;
+  private _gameType: GameType;
+  private _gameCategory: string;
   private _gameAbortTimer: NodeJS.Timeout; // to handle auto-abort due to  abandonment using setTimeOut
   private _whitePlayerTime: number; // time used up by white player
   private _blackPlayerTime: number; // time used up by black player
@@ -28,7 +34,9 @@ class GameState {
     gameId: string,
     whitePlayerId: string,
     blackPlayerId: string,
-    gameDuration: number
+    gameDuration: number,
+    gameType: GameType,
+    gameCategory: string
   ) {
     this._gameId = gameId;
     this._gameState = new Chess();
@@ -38,13 +46,13 @@ class GameState {
     this._blackPlayerTime = 0;
     this._lastMoveTime = Date.now();
     this._moveCount = 0;
+    this._gameType = gameType;
+    this._gameCategory = gameCategory;
     this._gameAbortTimer = setTimeout(() => {
       const payload = {
-        isAbandoned: true,
-        isCheckmate: false,
-        isDraw: false,
-        isTimesUp: false,
-        winnerId: "ABANDONED",
+        status: Status.COMPLETED,
+        result: GameResult.ABANDONED,
+        winnerId: null,
       };
 
       this._endGame(payload); // end the game
@@ -67,9 +75,146 @@ class GameState {
   }
 
   //End game
-  // To Do: handle game over by  times Up
-  private _endGame(payload: any) {
-    emitSocketEvent(this._gameId, GameEvent.END_GAME, payload);
+  private async _endGame({
+    result,
+    status,
+    winnerId,
+  }: {
+    result: GameResult;
+    status: Status;
+    winnerId: string | null;
+  }) {
+    try {
+      emitSocketEvent(this._gameId, GameEvent.END_GAME, { result, winnerId });
+
+      //updating game
+      if (this._gameCategory === GameCategory.TOURNAMENT_GAME) {
+        await db.tournamentGame.update({
+          where: {
+            id: this._gameId,
+          },
+          data: {
+            result: result,
+            status: status,
+            winnerId: winnerId,
+          },
+        });
+      } else {
+        await db.game.update({
+          where: {
+            id: this._gameId,
+          },
+          data: {
+            result: result,
+            status: status,
+            winnerId: winnerId,
+          },
+        });
+      }
+
+      // update user ratings
+      const whitePlayer = await db.user.findFirst({
+        where: {
+          id: this._whitePlayerId,
+        },
+        select: {
+          id: true,
+          blitz_rating: true,
+          rapid_rating: true,
+        },
+      });
+
+      const blackPlayer = await db.user.findFirst({
+        where: {
+          id: this._blackPlayerId,
+        },
+        select: {
+          id: true,
+          blitz_rating: true,
+          rapid_rating: true,
+        },
+      });
+
+      if (blackPlayer === null || whitePlayer === null) return;
+
+      const whitePlayerRating =
+        this._gameType === GameType.BLITZ
+          ? whitePlayer.blitz_rating
+          : whitePlayer.rapid_rating;
+      const blackPlayerRating =
+        this._gameType === GameType.BLITZ
+          ? blackPlayer.blitz_rating
+          : blackPlayer.rapid_rating;
+
+      //caculate expected score for white player
+      const whiteExpected = calExpectedScore(
+        whitePlayerRating,
+        blackPlayerRating
+      );
+      const blackExpected = 1 - whiteExpected;
+
+      //initialize for Draw
+      let whiteActual = 0.5;
+      let blackActual = 0.5;
+
+      if (result !== GameResult.DRAW) {
+        whiteActual = winnerId === whitePlayer.id ? 1 : 0;
+        blackActual = winnerId === blackPlayer.id ? 1 : 0;
+      }
+
+      const whiteNewRating = calNewRating(
+        whitePlayerRating,
+        whiteActual,
+        whiteExpected,
+        FACTOR
+      );
+      const blackNewRating = calNewRating(
+        blackPlayerRating,
+        blackActual,
+        blackExpected,
+        FACTOR
+      );
+
+      //update players ratings
+      //white player
+      await db.user.update({
+        where: {
+          id: whitePlayer.id,
+        },
+        data: {
+          blitz_rating:
+            this._gameType === GameType.BLITZ
+              ? whiteNewRating
+              : whitePlayer.blitz_rating,
+          rapid_rating:
+            this._gameType === GameType.RAPID
+              ? whiteNewRating
+              : whitePlayer.rapid_rating,
+        },
+      });
+
+      //black player
+      await db.user.update({
+        where: {
+          id: blackPlayer.id,
+        },
+        data: {
+          blitz_rating:
+            this._gameType === GameType.BLITZ
+              ? blackNewRating
+              : blackPlayer.blitz_rating,
+          rapid_rating:
+            this._gameType === GameType.RAPID
+              ? blackNewRating
+              : blackPlayer.rapid_rating,
+        },
+      });
+
+      // removing game from active games
+      gamesHandler.removeGame(this._gameId);
+    } catch (err) {
+      console.log("error updating DB from game end", err);
+    }
   }
 
   private _clearAbandonedTimer() {
@@ -87,10 +232,8 @@ class GameState {
 
     this._gameOverTimer = setTimeout(() => {
       const payload = {
-        isAbandoned: false,
-        isCheckmate: false,
-        isDraw: false,
-        isTimesUp: true,
+        result: GameResult.TIMES_UP,
+        status: Status.COMPLETED,
         winnerId: turn === "b" ? this._whitePlayerId : this._blackPlayerId,
       };
       this._endGame(payload);
@@ -146,25 +289,32 @@ class GameState {
       this._resetGameOverTimer();
 
       if (this._gameState.isGameOver()) {
-        const gameOverResult =
+        const winner =
           this._gameState.turn() === "b"
             ? this._blackPlayerId //white won
             : this._whitePlayerId; // black won
 
-        const payload = {
-          isAbandoned: false,
-          isCheckmate: this._gameState.isCheckmate(),
-          isDraw: this._gameState.isDraw(),
-          isTimesUp: false,
-          winnerId: gameOverResult,
-        };
-
-        this._endGame(payload); // end the game
+        if (this._gameState.isCheckmate()) {
+          const payload = {
+            result: GameResult.CHECKMATE,
+            status: Status.COMPLETED,
+            winnerId: winner,
+          };
+          this._endGame(payload); // end the game
+        } else if (this._gameState.isDraw()) {
+          const payload = {
+            result: GameResult.DRAW,
+            status: Status.COMPLETED,
+            winnerId: null,
+          };
+          this._endGame(payload); // end the game
+        }
       }
 
       return result; // NULL return if move is invald
     } catch (error) {
       console.log("error playing move ", error);
+      return null; // to undo on frontend
     }
   }
 

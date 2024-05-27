@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { IRound, hashPasswordType, jwtResponse } from "../interfaces/common.js";
-import { GameStatus } from "@prisma/client";
+import { Status } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import { Chess, Square, Piece } from "chess.js";
 import { GameType } from "@prisma/client";
@@ -99,7 +99,7 @@ function createSingleRoundRobin(
           whitePlayerId: player1 as string,
           blackPlayerId: player2 as string,
           tournamentId,
-          status: GameStatus.IN_PROGRESS,
+          status: Status.IN_PROGRESS,
           gameType,
           gameDuration,
           roundId: roundId,
@@ -151,10 +151,35 @@ const checkPromotion = (chess: Chess, from: Square, to: Square) => {
     .includes(to);
 };
 
+function calExpectedScore(ratingA: number, ratingB: number) {
+  const ratingDiff = ratingB - ratingA;
+  const expo = ratingDiff / 400;
+  let result;
+  if (expo < 0) {
+    result = Math.pow(1 / 10, Math.abs(expo));
+  } else {
+    result = Math.pow(10, expo);
+  }
+
+  let expectedScore = 1 / (result + 1);
+  return expectedScore;
+}
+
+function calNewRating(
+  oldRating: number,
+  actualScore: number,
+  expectedScore: number,
+  factor: number
+) {
+  return oldRating + factor * (actualScore - expectedScore);
+}
+
 export {
   issueJWT,
   genPassword,
   validPassword,
   createSingleRoundRobin,
   checkPromotion,
+  calExpectedScore,
+  calNewRating,
 };

@@ -1,10 +1,10 @@
 import { Response } from "express";
 import { IRequest } from "../interfaces/common.js";
 import { emitSocketEvent } from "../index.js";
-import { GameEvent } from "../constants.js";
+import { GameCategory, GameEvent } from "../constants.js";
 import db from "../configs/database.js";
 import { randomGame } from "../game/randomGameManager.js";
-import { GameStatus, GameType } from "@prisma/client";
+import { Status, GameType } from "@prisma/client";
 import { gamesHandler } from "../index.js";
 
 export const createNewGame = async (req: IRequest, res: Response) => {
@@ -36,14 +36,14 @@ export const createNewGame = async (req: IRequest, res: Response) => {
       data: {
         whitePlayerId: req.user.id, // assigning white to the game creater for now
         blackPlayerId: receiver.id, // assigning black to game reciever
-        status: GameStatus.IN_PROGRESS,
+        status: Status.IN_PROGRESS,
         gameType: gameType,
         gameDuration: gameDuration,
       },
     });
 
     //add to active games
-    gamesHandler.addGame(newGame);
+    gamesHandler.addGame(newGame, GameCategory.NORMAL_GAME);
 
     // logic to emit start_game socket event to both players
     emitSocketEvent(newGame.blackPlayerId, GameEvent.INIT_GAME, newGame.id);
@@ -102,7 +102,7 @@ export const getGamesHistory = async (req: IRequest, res: Response) => {
             ],
           },
           {
-            isGameOver: true,
+            status: Status.COMPLETED,
           },
         ],
       },
@@ -130,7 +130,7 @@ export const getGamesHistory = async (req: IRequest, res: Response) => {
             ],
           },
           {
-            isGameOver: true,
+            status: Status.COMPLETED,
           },
         ],
       },
