@@ -69,16 +69,24 @@ export default function ChooseFriend({
                     setOpen(false);
                   }}
                 >
-                  <LuCheck
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      participants === undefined
-                        ? friendUsername === friend.username
-                        : checked(friend.username)
+                  {participants === undefined && (
+                    <LuCheck
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        friendUsername === friend.username
                           ? "opacity-100"
                           : "opacity-0"
-                    )}
-                  />
+                      )}
+                    />
+                  )}
+                  {participants && (
+                    <LuCheck
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        checked(friend.username) ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  )}
                   {friend.username}
                 </CommandItem>
               ))}

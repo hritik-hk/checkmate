@@ -6,10 +6,14 @@ import { GameEvent } from "@/utils/constant";
 import { moveType } from "../interfaces/common";
 import CountDown from "./CountDown";
 import { useRef, useEffect } from "react";
+import lodash from "lodash";
+import { Chess } from "chess.js";
 
 export default function Board({
   gameId,
   gameState,
+  setGameState,
+  isGameOver,
   boardOrientation,
   myCountDown,
   opponentCountDown,
@@ -68,8 +72,9 @@ export default function Board({
     }
   };
 
-  const handleReceivedUpdate = (move: moveType) => {
-    gameState.move(move);
+  const handleReceivedUpdate = async (boardFen: string) => {
+    setGameState(new Chess(boardFen));
+
     stopOpponentTimer();
     startMyTimer();
   };
@@ -99,31 +104,48 @@ export default function Board({
     };
   }, []);
 
+  useEffect(() => {
+    if (isGameOver) {
+      stopMyTimer();
+      stopOpponentTimer();
+    }
+  }, [isGameOver]);
+
   function sendMoveUpdate(move: moveType) {
     socket?.emit(GameEvent.MOVE_UPDATE_EVENT, gameId, JSON.stringify(move));
   }
 
   function makeAMove(move: moveType) {
-    //check if player is trying to move opponent's chess pieces
-    if (gameState.turn() === "w" && boardOrientation === "black") {
+    const gameCopy = lodash.cloneDeep(gameState);
+    try {
+      //check if player is trying to move opponent's chess pieces
+      if (gameState.turn() === "w" && boardOrientation === "black") {
+        return null;
+      }
+
+      if (gameState.turn() === "b" && boardOrientation === "white") {
+        return null;
+      }
+
+      //play move
+      const result = gameCopy.move({
+        from: move.from,
+        to: move.to,
+      });
+      setGameState(gameCopy);
+      console.log("now turn of: ", gameCopy.turn());
+
+      return result; // null if the move was illegal, the move object if the move was legal
+    } catch (err) {
+      console.log("error playing move: ", err);
+      setGameState(gameCopy);
+      console.log("now turn of: ", gameCopy.turn());
       return null;
     }
-
-    if (gameState.turn() === "b" && boardOrientation === "white") {
-      return null;
-    }
-
-    //play move
-    const result = gameState.move({
-      from: move.from,
-      to: move.to,
-    });
-
-    return result; // null if the move was illegal, the move object if the move was legal
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
-    console.log({ sourceSquare, targetSquare });
+    console.log("playing from here", { sourceSquare, targetSquare });
 
     const move = {
       from: sourceSquare,

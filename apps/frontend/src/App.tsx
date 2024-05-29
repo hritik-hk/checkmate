@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAuth } from "./hooks/auth";
 import { getUrl } from "./utils/helpers";
 import { useSocket } from "./hooks/socket";
@@ -23,6 +23,10 @@ function App() {
     setMyCountDown,
     setOpponentCountDown,
   } = useGame();
+
+  //so that authUser is update without re-rendering
+  const authUserRef = useRef<typeof authUser>(null);
+  authUserRef.current = authUser;
 
   //TO DO : allow user to accept or decline incoming game request
   const handleGameRequest = async (request: any) => {
@@ -51,7 +55,13 @@ function App() {
   };
 
   const handleJoinGame = (gameInfo: gameInfoInterface) => {
-    console.log("gameInfo", gameInfo);
+    console.log("gameInfo sent from backend: ", gameInfo);
+
+    if (authUserRef.current === null) {
+      console.error("auth user is null");
+      return;
+    }
+
     const {
       gameDuration,
       boardStatus,
@@ -61,7 +71,7 @@ function App() {
     } = gameInfo;
 
     const myTimeConsumed =
-      whitePlayer.id === authUser?.id
+      whitePlayer.id === authUserRef.current.id
         ? timeUsedByWhitePlayer
         : timeUsedByBlackPlayer;
 
@@ -72,14 +82,6 @@ function App() {
 
     setCurrGameInfo(gameInfo);
     setGameState(new Chess(boardStatus));
-    console.log(
-      "my duration",
-      Math.floor((gameDuration - myTimeConsumed) / 1000)
-    );
-    console.log(
-      "oppo duration",
-      Math.floor((gameDuration - opponentTimeConsumed) / 1000)
-    );
 
     setMyCountDown(Math.floor((gameDuration - myTimeConsumed) / 1000));
     setOpponentCountDown(
@@ -177,6 +179,10 @@ function App() {
       socket.off(FriendEvent.FRIEND_REQUEST, handleFriendRequest);
     };
   }, [socket]);
+
+  // useEffect(() => {
+  //   console.log("update value of: ", currGameInfo);
+  // }, [currGameInfo]);
 
   return (
     <>

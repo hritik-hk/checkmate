@@ -70,11 +70,15 @@ export default class SocketService {
 
       //update the gameState by playing the move
       const currGame = gamesHandler.getGame(gameId);
-      const move = { from: moveUpdate.from, to: moveUpdate.to };
-      const result = currGame?.makeMove(move, socket?.user?.id as string);
+      if (currGame) {
+        const move = { from: moveUpdate.from, to: moveUpdate.to };
+        const result = currGame.makeMove(move, socket?.user?.id as string);
 
-      if (result) {
-        socket.to(gameId).emit(GameEvent.MOVE_UPDATE_EVENT, move);
+        if (result) {
+          socket
+            .to(gameId)
+            .emit(GameEvent.MOVE_UPDATE_EVENT, currGame.gameState.fen());
+        }
       }
     });
   }
@@ -153,7 +157,7 @@ export default class SocketService {
         this.mountCancelRandomGame(socket);
 
         socket.on(SocketEvent.DISCONNECT_EVENT, () => {
-          console.log("user has disconnected 🚫. userId: " + socket.user?.id);
+          console.log("user disconnected 🚫. userId: " + socket.user?.id);
           if (socket.user?.id) {
             socket.leave(socket.user.id);
           }

@@ -85,7 +85,33 @@ class GameState {
     winnerId: string | null;
   }) {
     try {
-      emitSocketEvent(this._gameId, GameEvent.END_GAME, { result, winnerId });
+      emitSocketEvent(this._gameId, GameEvent.END_GAME, {
+        result,
+        winnerId,
+        gameCategory: this._gameCategory,
+      });
+
+      //if game is abandoned , delete the game from DB
+      if (result === GameResult.ABANDONED) {
+        if (this._gameCategory === GameCategory.TOURNAMENT_GAME) {
+          await db.tournamentGame.delete({
+            where: {
+              id: this._gameId,
+            },
+          });
+        } else {
+          await db.game.delete({
+            where: {
+              id: this._gameId,
+            },
+          });
+        }
+
+        // removing game from active games
+        gamesHandler.removeGame(this._gameId);
+
+        return;
+      }
 
       //updating game
       if (this._gameCategory === GameCategory.TOURNAMENT_GAME) {
@@ -245,11 +271,11 @@ class GameState {
     try {
       //check if player is trying to move opponent's chess pieces
       if (this._gameState.turn() === "w" && playerId !== this._whitePlayerId) {
-        return;
+        return null;
       }
 
       if (this._gameState.turn() === "b" && playerId !== this._blackPlayerId) {
-        return;
+        return null;
       }
 
       const moveTimestamp = Date.now(); // to update _lastMoveTime
@@ -291,8 +317,8 @@ class GameState {
       if (this._gameState.isGameOver()) {
         const winner =
           this._gameState.turn() === "b"
-            ? this._blackPlayerId //white won
-            : this._whitePlayerId; // black won
+            ? this._whitePlayerId //white won
+            : this._blackPlayerId; // black won
 
         if (this._gameState.isCheckmate()) {
           const payload = {

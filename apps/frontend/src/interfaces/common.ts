@@ -134,6 +134,8 @@ export interface moveType {
 export interface boardProps {
   gameId: string;
   gameState: Chess;
+  setGameState: React.Dispatch<React.SetStateAction<Chess | null>>;
+  isGameOver: boolean;
   boardOrientation: BoardOrientation;
   myCountDown: number | null;
   opponentCountDown: number | null;

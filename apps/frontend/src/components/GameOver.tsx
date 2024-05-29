@@ -6,10 +6,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
+import { GameCategory } from "@/utils/constant";
+import { useTournament } from "@/hooks/tournament";
+import { useNavigate } from "react-router-dom";
 
-export default function GameOver({ isGameOver, gameResult, winner }: any) {
-  function handleRematch() {
-    console.log("logic  to handle rematch");
+export default function GameOver({
+  isGameOver,
+  gameResult,
+  winner,
+  gameCategory,
+}: any) {
+  const { ongoingTournament } = useTournament();
+  const navigate = useNavigate();
+
+  function redirectToTournament() {
+    navigate(`/tournament/${ongoingTournament}`);
   }
 
   return (
@@ -22,9 +33,11 @@ export default function GameOver({ isGameOver, gameResult, winner }: any) {
         </DialogHeader>
         <div>by {gameResult}</div>
 
-        <DialogFooter>
-          <Button onClick={handleRematch}>Rematch</Button>
-        </DialogFooter>
+        {gameCategory === GameCategory.TOURNAMENT_GAME && (
+          <DialogFooter>
+            <Button onClick={redirectToTournament}>Go To Tournament</Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

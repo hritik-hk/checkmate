@@ -2,8 +2,8 @@ import { PriorityQueue, ICompare } from "@datastructures-js/priority-queue";
 import { IRequest, IUser } from "../interfaces/common.js";
 import db from "../configs/database.js";
 import { emitSocketEvent } from "../index.js";
-import { GameEvent } from "../constants.js";
-import { GameType, GameStatus } from "@prisma/client";
+import { GameCategory, GameEvent } from "../constants.js";
+import { GameType, Status } from "@prisma/client";
 import { gamesHandler } from "../index.js";
 
 const compareBlitz: ICompare<IUser> = (user1: IUser, user2: IUser) => {
@@ -52,14 +52,14 @@ class randomGameManager {
           data: {
             whitePlayerId: whitePlayer.id,
             blackPlayerId: blackPlayer.id,
-            status: GameStatus.IN_PROGRESS,
+            status: Status.IN_PROGRESS,
             gameType: req.body.gameType,
             gameDuration: req.body.gameDuration,
           },
         });
 
         //add to active games
-        gamesHandler.addGame(newGame);
+        gamesHandler.addGame(newGame, GameCategory.NORMAL_GAME);
 
         // emit start_game socket event to both players
         emitSocketEvent(newGame.blackPlayerId, GameEvent.INIT_GAME, newGame.id);
@@ -104,14 +104,14 @@ class randomGameManager {
           data: {
             whitePlayerId: whitePlayer.id,
             blackPlayerId: blackPlayer.id,
-            status: GameStatus.IN_PROGRESS,
+            status: Status.IN_PROGRESS,
             gameType: req.body.gameType,
             gameDuration: req.body.gameDuration,
           },
         });
 
         //add to active games
-        gamesHandler.addGame(newGame);
+        gamesHandler.addGame(newGame, GameCategory.NORMAL_GAME);
 
         // emit start_game socket event to both players
         emitSocketEvent(newGame.blackPlayerId, GameEvent.INIT_GAME, newGame.id);

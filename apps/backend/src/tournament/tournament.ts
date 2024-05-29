@@ -67,7 +67,8 @@ class Tournament {
 
     this._resetRoundStart();
 
-    //To Do: make updates in database
+    //To-Do: make updates in database
+    // To-DO: remove from active tournaments when tournament Ends
 
     const currRound = this._rounds.front();
     const delay = Number(currRound?.endTime) - Date.now();

@@ -30,3 +30,19 @@ export const TournamentEvent = {
 export const FriendEvent = {
   FRIEND_REQUEST: "FRIEND_REQUEST",
 };
+
+export const GameResult = {
+  ABANDONED: "ABANDONED",
+  DRAW: "DRAW",
+  CHECKMATE: "CHECKMATE",
+  TIMES_UP: "TIMES_UP",
+} as const;
+
+export type Result = "ABANDONED" | "DRAW" | "CHECKMATE" | "TIMES_UP";
+
+export const GameCategory = {
+  TOURNAMENT_GAME: "TOURNAMENT_GAME",
+  NORMAL_GAME: "NORMAL_GAME",
+} as const;
+
+export type Category = "TOURNAMENT_GAME" | "NORMAL_GAME";
