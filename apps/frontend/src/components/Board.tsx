@@ -8,6 +8,7 @@ import CountDown from "./CountDown";
 import { useRef, useEffect } from "react";
 import lodash from "lodash";
 import { Chess } from "chess.js";
+import { checkPromotion } from "@/utils/helpers";
 
 export default function Board({
   gameId,
@@ -75,6 +76,10 @@ export default function Board({
   const handleReceivedUpdate = async (boardFen: string) => {
     setGameState(new Chess(boardFen));
 
+    //to stop timers on game-over
+    const tempState = new Chess(boardFen);
+    if (tempState.isGameOver()) return;
+
     stopOpponentTimer();
     startMyTimer();
   };
@@ -128,10 +133,21 @@ export default function Board({
       }
 
       //play move
-      const result = gameCopy.move({
-        from: move.from,
-        to: move.to,
-      });
+      let result = null;
+
+      if (checkPromotion(gameCopy, move.from, move.to)) {
+        result = gameCopy.move({
+          from: move.from,
+          to: move.to,
+          promotion: "q", // promote to queen by default for NOW!!
+        });
+      } else {
+        result = gameCopy.move({
+          from: move.from,
+          to: move.to,
+        });
+      }
+
       setGameState(gameCopy);
       console.log("now turn of: ", gameCopy.turn());
 

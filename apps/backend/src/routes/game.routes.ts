@@ -8,7 +8,7 @@ const router = express.Router();
 
 router
   .post("/new", createNewGame)
-  .get("/random", handleRandomGame)
+  .post("/random", handleRandomGame)
   .post("/history", getGamesHistory);
 
 export default router;

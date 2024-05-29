@@ -1,25 +1,33 @@
 import _ from "lodash";
-import { Chess } from "chess.js";
-import { moveType } from "../interfaces/common";
+import { Chess, Square } from "chess.js";
 
 export const getUrl = (path: string): string => {
   const baseUri = import.meta.env.VITE_SERVER_URI;
   return `${baseUri}/${path}`;
 };
 
-export function makeAMove(
-  moveMade: moveType,
-  gameState: Chess,
-  setGameState: React.Dispatch<React.SetStateAction<Chess>>
-) {
-  try {
-    const gameCopy = _.cloneDeep(gameState);
-    const result = gameCopy.move(moveMade);
-
-    setGameState(gameCopy);
-
-    return result; // null if the move was illegal, the move object if the move was legal
-  } catch (error) {
-    console.log("error while updating move from server", error);
+// for checking if pawn could be promoted
+export const checkPromotion = (chess: Chess, from: Square, to: Square) => {
+  if (!from) {
+    return false;
   }
-}
+
+  const piece = chess.get(from);
+
+  if (piece?.type !== "p") {
+    return false;
+  }
+
+  if (piece.color !== chess.turn()) {
+    return false;
+  }
+
+  if (!["1", "8"].some((it) => to.endsWith(it))) {
+    return false;
+  }
+
+  return chess
+    .moves({ square: from, verbose: true })
+    .map((it) => it.to)
+    .includes(to);
+};
