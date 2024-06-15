@@ -180,10 +180,6 @@ function App() {
     };
   }, [socket]);
 
-  // useEffect(() => {
-  //   console.log("update value of: ", currGameInfo);
-  // }, [currGameInfo]);
-
   return (
     <>
       <AppRoutes />

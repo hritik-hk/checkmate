@@ -5,13 +5,17 @@ import {
   SocketContextInterface,
   SocketProviderProps,
 } from "../interfaces/common";
+import { useAuth } from "@/hooks/auth";
 
 export const SocketContext = createContext<SocketContextInterface | null>(null);
 
 export const SocketContextProvider = ({ children }: SocketProviderProps) => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  const { isLoggedIn } = useAuth();
+
   useEffect(() => {
+    if (isLoggedIn === false) return;
     const socket = io(import.meta.env.VITE_SOCKET_URI, {
       withCredentials: true,
     });
@@ -21,10 +25,10 @@ export const SocketContextProvider = ({ children }: SocketProviderProps) => {
       socket.disconnect();
       setSocket(null);
     };
-  }, []);
+  }, [isLoggedIn]);
 
   return (
-    <SocketContext.Provider value={{ socket }}>
+    <SocketContext.Provider value={{ socket, setSocket }}>
       {children}
     </SocketContext.Provider>
   );

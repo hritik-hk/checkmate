@@ -6,6 +6,7 @@ import Home from "../pages/Home";
 import Game from "../pages/Game";
 import Tournament from "@/pages/Tournament";
 import UserProfile from "@/pages/UserProfile";
+import Logout from "@/components/Logout";
 
 export default function AppRoutes() {
   return (
@@ -29,6 +30,7 @@ export default function AppRoutes() {
       />
 
       <Route path="/login" element={<Login />} />
+      <Route path="/logout" element={<Logout />} />
       <Route
         path="/tournament/:tournamentId"
         element={

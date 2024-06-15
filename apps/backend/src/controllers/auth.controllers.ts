@@ -83,4 +83,14 @@ const checkAuth = async (req: IRequest, res: Response) => {
   }
 };
 
-export { createUser, loginUser, checkAuth };
+const logout = async (req: IRequest, res: Response) => {
+  res
+    .status(200)
+    .cookie("accessToken", "", {
+      maxAge: 0,
+      httpOnly: true,
+    })
+    .json({ msg: "successfully loggedout" });
+};
+
+export { createUser, loginUser, checkAuth, logout };

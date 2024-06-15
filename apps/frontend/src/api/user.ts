@@ -1,5 +1,5 @@
 import { getUrl } from "../utils/helpers";
-import { user } from "../interfaces/common";
+import { IUser } from "../interfaces/common";
 
 export const getUserByUsername = async (username: string) => {
   try {
@@ -11,7 +11,7 @@ export const getUserByUsername = async (username: string) => {
       throw new Error("user not found");
     }
 
-    const user: user = await resp.json();
+    const user: IUser = await resp.json();
     return user;
   } catch (err) {
     console.error(err);
@@ -117,5 +117,22 @@ export const getSentRequests = async () => {
   } catch (err) {
     console.log(err);
     return [];
+  }
+};
+
+export const logout = async () => {
+  try {
+    const response = await fetch(getUrl("auth/logout"), {
+      credentials: "include",
+    });
+    if (!response.ok) {
+      const message = "something went wrong, try again";
+      throw new Error(message);
+    }
+
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
   }
 };

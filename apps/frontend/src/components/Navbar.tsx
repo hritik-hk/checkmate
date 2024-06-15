@@ -74,7 +74,7 @@ export default function Navbar() {
               </div>
 
               <div className="bg-white text-black p-2 rounded-md">
-                <Link to="/user" className=" py-2 px-3 rounded">
+                <Link to="/logout" className=" py-2 px-3 rounded">
                   Logout
                 </Link>
               </div>

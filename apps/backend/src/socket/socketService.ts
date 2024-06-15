@@ -137,7 +137,7 @@ export default class SocketService {
         console.log("User connected, userId: ", user.id);
         next();
       } catch (err) {
-        console.log(err);
+        //console.log(err);
         next(
           new Error("Something went wrong while connecting to websocket server")
         );

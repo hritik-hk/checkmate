@@ -70,6 +70,7 @@ export interface SocketProviderProps {
 
 export interface SocketContextInterface {
   socket: Socket | null;
+  setSocket: React.Dispatch<React.SetStateAction<Socket | null>>;
 }
 
 export interface GameContextInterface {
