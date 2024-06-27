@@ -56,8 +56,8 @@ export default function Tournament() {
     if (!socket) return;
     if (!tournamentId) return;
 
-    socket.emit(TournamentEvent.JOIN_TOURNAMENT, tournamentId);
     socket.on(TournamentEvent.ROUND_UPDATE, handleRoundUpdate);
+    socket.emit(TournamentEvent.JOIN_TOURNAMENT, tournamentId);
 
     const fetchFixture = async () => {
       const data = await getFixture(tournamentId);

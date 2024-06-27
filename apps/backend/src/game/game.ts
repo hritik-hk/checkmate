@@ -91,6 +91,12 @@ class GameState {
         gameCategory: this._gameCategory,
       });
 
+      // Clear Gameover timer timeout
+      //so that if the game ends by other than times up, this doesnt send another game over result
+      if (this._gameOverTimer) {
+        clearTimeout(this._gameOverTimer);
+      }
+
       //if game is abandoned , delete the game from DB
       if (result === GameResult.ABANDONED) {
         if (this._gameCategory === GameCategory.TOURNAMENT_GAME) {

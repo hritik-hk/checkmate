@@ -9,9 +9,11 @@ import { Button } from "./ui/button";
 import { GameCategory } from "@/utils/constant";
 import { useTournament } from "@/hooks/tournament";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function GameOver({
   isGameOver,
+  setIsGameOver,
   gameResult,
   winner,
   gameCategory,
@@ -23,8 +25,14 @@ export default function GameOver({
     navigate(`/tournament/${ongoingTournament}`);
   }
 
+  useEffect(() => {
+    if (isGameOver && gameCategory === GameCategory.TOURNAMENT_GAME) {
+      setTimeout(redirectToTournament, 10000);
+    }
+  }, [isGameOver]);
+
   return (
-    <Dialog open={isGameOver}>
+    <Dialog open={isGameOver} onOpenChange={() => setIsGameOver(false)}>
       <DialogContent className="max-w-[400px] md:max-w-[425px] bg-stone-700">
         <DialogHeader>
           <DialogTitle>
@@ -36,6 +44,7 @@ export default function GameOver({
         {gameCategory === GameCategory.TOURNAMENT_GAME && (
           <DialogFooter>
             <Button onClick={redirectToTournament}>Go To Tournament</Button>
+            <div>You will be redirect to tournament page in 10 seconds</div>
           </DialogFooter>
         )}
       </DialogContent>

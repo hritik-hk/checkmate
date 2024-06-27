@@ -78,6 +78,7 @@ export default function Game() {
       <Navbar />
       <GameOver
         isGameOver={isGameOver}
+        setIsGameOver={setIsGameOver}
         gameResult={gameResult}
         winner={winner}
         gameCategory={gameCategory}
