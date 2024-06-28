@@ -52,7 +52,11 @@ class GameState {
       const payload = {
         status: Status.COMPLETED,
         result: GameResult.ABANDONED,
-        winnerId: null,
+        //the player who didnt any move in the beginning will loose
+        winnerId:
+          this._gameState.turn() === "b"
+            ? this._whitePlayerId
+            : this._blackPlayerId,
       };
 
       this._endGame(payload); // end the game
@@ -85,6 +89,8 @@ class GameState {
     winnerId: string | null;
   }) {
     try {
+      //TO DO: handle "DRAW"
+
       emitSocketEvent(this._gameId, GameEvent.END_GAME, {
         result,
         winnerId,
@@ -95,28 +101,6 @@ class GameState {
       //so that if the game ends by other than times up, this doesnt send another game over result
       if (this._gameOverTimer) {
         clearTimeout(this._gameOverTimer);
-      }
-
-      //if game is abandoned , delete the game from DB
-      if (result === GameResult.ABANDONED) {
-        if (this._gameCategory === GameCategory.TOURNAMENT_GAME) {
-          await db.tournamentGame.delete({
-            where: {
-              id: this._gameId,
-            },
-          });
-        } else {
-          await db.game.delete({
-            where: {
-              id: this._gameId,
-            },
-          });
-        }
-
-        // removing game from active games
-        gamesHandler.removeGame(this._gameId);
-
-        return;
       }
 
       //updating game
@@ -303,7 +287,7 @@ class GameState {
 
       this._moveCount++;
       //clear game abandoned timer
-      if (this._moveCount > 2) this._clearAbandonedTimer();
+      if (this._moveCount >= 2) this._clearAbandonedTimer();
 
       // update the time used by the player
       // as the _gameState is updated, using reverse logic

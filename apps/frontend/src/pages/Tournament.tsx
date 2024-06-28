@@ -103,11 +103,12 @@ export default function Tournament() {
       const data = await getPointsTable(tournamentId);
       let pos = 1;
       for (let i = 1; i < data.length; i++) {
-        if (data[i - 1].point < data[i].point) {
+        if (data[i - 1].point > data[i].point) {
           pos++;
         }
         data[i].position = pos;
       }
+
       setPointsTable(data);
     };
 
@@ -146,7 +147,7 @@ export default function Tournament() {
                       {pointsTable.map((player, index) => (
                         <TableRow key={index}>
                           <TableCell className="font-bold">
-                            {player.position}
+                            {`#${player.position}`}
                           </TableCell>
                           <TableCell>{player.player_username}</TableCell>
                           <TableCell>{player.point}</TableCell>

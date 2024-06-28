@@ -94,10 +94,10 @@ export const getGamesHistory = async (req: IRequest, res: Response) => {
           {
             OR: [
               {
-                blackPlayerId: user.id,
+                whitePlayerId: user.id,
               },
               {
-                whitePlayerId: user.id,
+                blackPlayerId: user.id,
               },
             ],
           },
@@ -108,8 +108,18 @@ export const getGamesHistory = async (req: IRequest, res: Response) => {
       },
       select: {
         gameType: true,
-        blackPlayer: true,
-        whitePlayer: true,
+        blackPlayer: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+        whitePlayer: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
         winnerId: true,
         createdAt: true,
       },
@@ -136,14 +146,26 @@ export const getGamesHistory = async (req: IRequest, res: Response) => {
       },
       select: {
         gameType: true,
-        blackPlayer: true,
-        whitePlayer: true,
+        blackPlayer: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+        whitePlayer: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
         winnerId: true,
         createdAt: true,
       },
     });
 
     const gamesHistory = [...games, ...tournamentGames];
+
+    //to do: sort gameHistory acc to data in decending order
 
     return res.status(200).json(gamesHistory);
   } catch (err) {

@@ -47,18 +47,18 @@ export default function Game() {
     setIsGameOver(true);
     setGameCategory(payload.gameCategory);
 
+    //TO DO: HANDLE "GAME DRAW" FIRST AS winner ID would be null
+
+    payload.winnerId === currGameInfoRef.current.whitePlayer.id
+      ? setWinner(currGameInfoRef.current.whitePlayer.username)
+      : setWinner(currGameInfoRef.current.blackPlayer.username);
+
     if (payload.result === GameResult.CHECKMATE) {
       setGameResult("CHECKMATE");
-      payload.winnerId === currGameInfoRef.current.whitePlayer.id
-        ? setWinner(currGameInfoRef.current.whitePlayer.username)
-        : setWinner(currGameInfoRef.current.blackPlayer.username);
     } else if (payload.result === GameResult.TIMES_UP) {
       setGameResult("TIMES UP");
-      payload.winnerId === currGameInfoRef.current.whitePlayer.id
-        ? setWinner(currGameInfoRef.current.whitePlayer.username)
-        : setWinner(currGameInfoRef.current.blackPlayer.username);
-    } else {
-      setGameResult(payload.result);
+    } else if (payload.result === GameResult.ABANDONED) {
+      setGameResult("ABANDONMENT");
     }
   }
 

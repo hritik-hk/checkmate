@@ -45,7 +45,7 @@ export default function GameOver({
             {winner === "" ? "Game Over" : `${winner} won!!`}
           </DialogTitle>
         </DialogHeader>
-        <div>by {gameResult}</div>
+        <div>due to {gameResult}</div>
 
         {gameCategory === GameCategory.TOURNAMENT_GAME && (
           <DialogFooter>

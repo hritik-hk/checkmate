@@ -86,7 +86,6 @@ class Tournament {
   }
 
   public getCurrRoundInfo() {
-    console.log(this._rounds);
     return this._rounds.front();
   }
 }

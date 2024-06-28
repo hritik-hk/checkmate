@@ -60,6 +60,7 @@ model Tournament {
   id              String           @id @default(uuid())
   participants    String[]
   status          Status
+  gameType        GameType
   TournamentGames TournamentGame[]
   Rounds          Round[]
 }

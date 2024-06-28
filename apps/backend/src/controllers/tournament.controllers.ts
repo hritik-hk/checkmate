@@ -13,6 +13,8 @@ export const createTournament = async (req: IRequest, res: Response) => {
     const gameType = req.body?.gameType;
     const gameDuration = req.body.gameDuration;
 
+    console.log("creating tournamen of type: ", gameType);
+
     if (participants.length < 3) {
       return res
         .status(400)
@@ -40,6 +42,7 @@ export const createTournament = async (req: IRequest, res: Response) => {
     const newTournament = await db.tournament.create({
       data: {
         participants: playerIds,
+        gameType: gameType,
         status: Status.IN_PROGRESS,
       },
     });
@@ -52,11 +55,11 @@ export const createTournament = async (req: IRequest, res: Response) => {
       gameDuration
     );
 
-    const rounds = await db.round.createMany({
+    await db.round.createMany({
       data: tournamentData.rounds,
     });
 
-    const tournamentGames = await db.tournamentGame.createMany({
+    await db.tournamentGame.createMany({
       data: tournamentData.tournamentGames,
     });
 
@@ -86,13 +89,13 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
   try {
     const tournamentId = req.body.tournamentId;
 
-    //Todo: add gameType in tournament schema itself
-    const data = await db.tournament.findFirst({
+    const tournament = await db.tournament.findFirst({
       where: {
         id: tournamentId,
       },
       select: {
         participants: true,
+        gameType: true,
       },
     });
 
@@ -105,10 +108,10 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
       position: number;
     }[] = [];
 
-    if (!data) return res.status(400).json({ msg: "invalid tournament" });
+    if (!tournament) return res.status(400).json({ msg: "invalid tournament" });
 
-    for (let i = 0; i < data.participants.length; i++) {
-      const player = data.participants[i] as string;
+    for (let i = 0; i < tournament.participants.length; i++) {
+      const player = tournament.participants[i] as string;
       const games = await db.tournamentGame.findMany({
         where: {
           OR: [
@@ -131,6 +134,7 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
                 },
                 {
                   tournamentId: tournamentId,
+                  result: GameResult.DRAW,
                   status: Status.COMPLETED,
                 },
               ],
@@ -140,7 +144,6 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
         select: {
           id: true,
           result: true,
-          gameType: true,
         },
       });
 
@@ -172,7 +175,7 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
         gamesPlayed: games.length,
         point: point,
         rating:
-          games[0]?.gameType === GameType.BLITZ
+          tournament.gameType === GameType.BLITZ
             ? (user?.blitz_rating as number)
             : (user?.rapid_rating as number),
         position: 1,
