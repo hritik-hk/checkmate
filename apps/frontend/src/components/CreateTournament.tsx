@@ -16,8 +16,11 @@ import ChooseFriend from "./ChooseFriend";
 import { IFriend } from "@/interfaces/common";
 import { toast } from "sonner";
 import { createTournament } from "@/api/tournament";
+import { useAuth } from "@/hooks/auth";
 
 export function CreateTournament({ userFriends }: { userFriends: IFriend[] }) {
+  const { authUser } = useAuth();
+
   const [gameType, setGameType] = useState<{
     type: string;
     duration: number;
@@ -25,7 +28,9 @@ export function CreateTournament({ userFriends }: { userFriends: IFriend[] }) {
 
   const [friendUsername, setFriendUsername] = useState<string>("");
   const [search, setSearch] = useState<string>("");
-  const [participants, setParticipants] = useState<string[]>([]);
+  const [participants, setParticipants] = useState<string[]>([
+    authUser?.username as string,
+  ]);
 
   const options = [
     {
@@ -58,7 +63,11 @@ export function CreateTournament({ userFriends }: { userFriends: IFriend[] }) {
 
     const user = await getUserByUsername(search);
     if (user) {
-      setFriendUsername(search);
+      if (user.id === authUser?.id) {
+        toast.error("You cannot select yourself!");
+      } else {
+        setFriendUsername(search);
+      }
     } else {
       console.log("invalid username");
       toast.error("Invalid username");
@@ -109,14 +118,6 @@ export function CreateTournament({ userFriends }: { userFriends: IFriend[] }) {
         <DialogHeader>
           <DialogTitle> Create Tournament</DialogTitle>
         </DialogHeader>
-        <div>
-          <p>Name: </p>
-          <Input
-            className="h-12 text-md"
-            placeholder="Give"
-            onChange={(e: any) => setSearch(e.target.value)}
-          ></Input>
-        </div>
         <div>#Choose game type in tournament</div>
         <div className="mb-4">
           {options.map((type) => {

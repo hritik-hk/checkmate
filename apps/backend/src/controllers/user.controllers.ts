@@ -43,7 +43,7 @@ export const fetchUserByUsername = async (req: Request, res: Response) => {
       return res.status(404).json({ msg: "user not found" });
     }
 
-    res.status(200).json(user);
+    return res.status(200).json(user);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ err });
@@ -132,7 +132,10 @@ export const addFriendship = async (req: IRequest, res: Response) => {
   }
 };
 
-export const getRecievedFriendRequests = async (req: IRequest, res: Response) => {
+export const getRecievedFriendRequests = async (
+  req: IRequest,
+  res: Response
+) => {
   try {
     const user = req.user;
 

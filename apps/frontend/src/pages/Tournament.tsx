@@ -1,4 +1,4 @@
-import Countdown from "react-countdown";
+import CountDown from "@/components/CountDown";
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 
 import Navbar from "@/components/Navbar";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Separator } from "@radix-ui/react-separator";
 import { points, fixtureRow, roundInterface } from "@/interfaces/common";
 import { getPointsTable, getFixture } from "@/api/tournament";
@@ -29,19 +29,45 @@ export default function Tournament() {
     null
   );
 
-  // Renderer callback with condition
-  const renderer = ({ hours, minutes, seconds, completed }: any) => {
-    if (completed) {
-      return <span>00h00m00s</span>;
-    } else {
-      // Render a countdown
-      return (
-        <span>
-          {hours < 10 ? `0${hours}` : hours}h
-          {minutes < 10 ? `0${minutes}` : minutes}m
-          {seconds < 10 ? `0${seconds}` : seconds}s
-        </span>
-      );
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [status, setStatus] = useState<string>("start");
+
+  const countdownId = useRef<NodeJS.Timeout | null>(null);
+
+  const resetCountdown = () => {
+    if (countdownId.current) {
+      clearInterval(countdownId.current);
+      countdownId.current = null;
+    }
+
+    if (currRoundInfo) {
+      if (Number(currRoundInfo.startTime) > Date.now()) {
+        setCountdown(
+          Math.floor((Number(currRoundInfo.startTime) - Date.now()) / 1000)
+        );
+        setStatus("start");
+      } else {
+        setCountdown(
+          Math.floor((Number(currRoundInfo.endTime) - Date.now()) / 1000)
+        );
+        setStatus("end");
+      }
+
+      startCountdown();
+    }
+  };
+
+  const startCountdown = () => {
+    if (!countdownId.current) {
+      countdownId.current = setInterval(() => {
+        setCountdown((prevSeconds) => {
+          if (prevSeconds === null) return null;
+          else if (prevSeconds <= 1) {
+            setStatus("end");
+            return 0;
+          } else return prevSeconds - 1;
+        });
+      }, 1000); // Update every second
     }
   };
 
@@ -52,12 +78,21 @@ export default function Tournament() {
     console.log("end>now", Number(currRoundInfo.endTime) > Date.now());
   }
 
+  //setup socket event listeners
   useEffect(() => {
     if (!socket) return;
-    if (!tournamentId) return;
 
     socket.on(TournamentEvent.ROUND_UPDATE, handleRoundUpdate);
     socket.emit(TournamentEvent.JOIN_TOURNAMENT, tournamentId);
+
+    return () => {
+      socket.off(TournamentEvent.ROUND_UPDATE, handleRoundUpdate);
+    };
+  }, []);
+
+  // fetch points table and tournament fixture
+  useEffect(() => {
+    if (!tournamentId) return;
 
     const fetchFixture = async () => {
       const data = await getFixture(tournamentId);
@@ -78,18 +113,18 @@ export default function Tournament() {
 
     fetchPointsTable();
     fetchFixture();
+  }, [currRoundInfo]);
 
-    return () => {
-      socket.off(TournamentEvent.ROUND_UPDATE, handleRoundUpdate);
-    };
-  }, []);
+  useEffect(() => {
+    resetCountdown();
+  }, [status, currRoundInfo]);
 
   return (
     <>
       <Navbar />
       {fixture && pointsTable && (
         <div>
-          <div className="px-48 bg-stone-700">
+          <div className="px-48 bg-stone-700 h-3/4">
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2">
               <div>
                 {/* points table */}
@@ -165,26 +200,15 @@ export default function Tournament() {
             </div>
           </div>
 
-          <div className="p-5">
+          <div className="p-5 flex justify-center items-center">
             {currRoundInfo && (
               <div className="text-3xl">
-                {Date.now() < Number(currRoundInfo.startTime) ? (
-                  <div>
-                    <div>{`Round: ${currRoundInfo.roundNumber} starts in`}</div>
-                    <Countdown
-                      date={Number(currRoundInfo.startTime)}
-                      renderer={renderer}
-                    />
-                  </div>
+                {status === "start" ? (
+                  <div>{`Round: ${currRoundInfo.roundNumber} starts in `}</div>
                 ) : (
-                  <div>
-                    <div>{`Round: ${currRoundInfo.roundNumber} ends in`}</div>
-                    <Countdown
-                      date={Number(currRoundInfo.endTime)}
-                      renderer={renderer}
-                    />
-                  </div>
+                  <div>{`Round: ${currRoundInfo.roundNumber} ends in `}</div>
                 )}
+                {countdown && <CountDown seconds={countdown} />}
               </div>
             )}
           </div>

@@ -9,7 +9,7 @@ import { Button } from "./ui/button";
 import { GameCategory } from "@/utils/constant";
 import { useTournament } from "@/hooks/tournament";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function GameOver({
   isGameOver,
@@ -20,14 +20,20 @@ export default function GameOver({
 }: any) {
   const { ongoingTournament } = useTournament();
   const navigate = useNavigate();
+  const redirectTimer = useRef<NodeJS.Timeout | null>(null);
 
   function redirectToTournament() {
+    if (redirectTimer.current) {
+      clearInterval(redirectTimer.current);
+      redirectTimer.current = null;
+    }
+    console.log("navigating to tournamentId: ", ongoingTournament);
     navigate(`/tournament/${ongoingTournament}`);
   }
 
   useEffect(() => {
     if (isGameOver && gameCategory === GameCategory.TOURNAMENT_GAME) {
-      setTimeout(redirectToTournament, 10000);
+      redirectTimer.current = setTimeout(redirectToTournament, 10000);
     }
   }, [isGameOver]);
 
@@ -44,7 +50,7 @@ export default function GameOver({
         {gameCategory === GameCategory.TOURNAMENT_GAME && (
           <DialogFooter>
             <Button onClick={redirectToTournament}>Go To Tournament</Button>
-            <div>You will be redirect to tournament page in 10 seconds</div>
+            <div>You will be redirected to tournament page in 10 seconds</div>
           </DialogFooter>
         )}
       </DialogContent>

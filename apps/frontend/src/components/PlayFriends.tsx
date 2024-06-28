@@ -95,12 +95,13 @@ export function PlayFriends({ userFriends }: { userFriends: IFriend[] }) {
         <div className="mb-4">
           {options.map((type) => {
             return (
-              <div>
+              <div key={type.label}>
                 <div>{type.label}</div>
                 <div className="my-4">
                   {type.value.map((duration) => {
                     return (
                       <span
+                        key={duration.label}
                         className="mx-2 py-3 px-5 rounded-md bg-stone-600 font-bold text-white cursor-pointer"
                         style={
                           game?.gameDuration === duration.value

@@ -19,16 +19,34 @@ export const createTournament = async (req: IRequest, res: Response) => {
         .json({ error: "Pls select atleast 3 participants for Tournament" });
     }
 
+    //check if all the participants exist in db
+    const users = await db.user.findMany({
+      where: {
+        username: {
+          in: participants,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (users.length !== participants.length) {
+      return res.status(400).json({ error: "some users are invalid" });
+    }
+
+    const playerIds = users.map((player) => player.id);
+
     const newTournament = await db.tournament.create({
       data: {
-        participants: participants,
+        participants: playerIds,
         status: Status.IN_PROGRESS,
       },
     });
 
     //create all tournament games - round robin format
     const tournamentData = createSingleRoundRobin(
-      participants,
+      playerIds,
       newTournament.id,
       gameType,
       gameDuration
@@ -46,8 +64,8 @@ export const createTournament = async (req: IRequest, res: Response) => {
     await tournamentHandler.addTournament(newTournament.id);
 
     //To Do: emit tournament init event to all participants
-    for (let i = 0; i < participants.length; i++) {
-      const playerId = participants[i];
+    for (let i = 0; i < playerIds.length; i++) {
+      const playerId = playerIds[i];
       if (playerId) {
         emitSocketEvent(
           playerId,
@@ -57,7 +75,7 @@ export const createTournament = async (req: IRequest, res: Response) => {
       }
     }
 
-    return res.status(200).json({ newTournament, tournamentGames, rounds });
+    return res.status(200).json({ id: newTournament.id });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);

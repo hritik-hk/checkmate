@@ -74,17 +74,10 @@ class Tournament {
     const delay = Number(currRound?.endTime) - Date.now();
 
     //send round updates
-    const roundUpdate = {
-      roundId: currRound?.id,
-      roundNumber: currRound?.roundNumber,
-      roundStart: currRound?.startTime,
-      roundEnd: currRound?.endTime,
-      roundGames: currRound?.roundGames,
-    };
     emitSocketEvent(
       this._tournamentId,
       TournamentEvent.ROUND_UPDATE,
-      roundUpdate
+      currRound
     );
 
     this._currRoundEnd = setTimeout(() => {

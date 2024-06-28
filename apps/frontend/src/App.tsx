@@ -11,6 +11,7 @@ import { gameInfoInterface } from "./interfaces/common";
 import { Chess } from "chess.js";
 import { toast } from "sonner";
 import { declineFriendRequest, addFriendship } from "./api/user";
+import { useTournament } from "./hooks/tournament";
 
 function App() {
   const { isLoggedIn, setIsLoggedIn, setAuthUser, authUser } = useAuth();
@@ -23,6 +24,8 @@ function App() {
     setMyCountDown,
     setOpponentCountDown,
   } = useGame();
+
+  const { setOngoingTournament } = useTournament();
 
   //so that authUser is update without re-rendering
   const authUserRef = useRef<typeof authUser>(null);
@@ -51,6 +54,7 @@ function App() {
   };
 
   const handleStartTournament = (tournamentId: string) => {
+    setOngoingTournament(tournamentId);
     navigate(`/tournament/${tournamentId}`);
   };
 
