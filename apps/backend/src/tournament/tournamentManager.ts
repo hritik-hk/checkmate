@@ -34,8 +34,12 @@ class tournamentManager {
     }
   }
 
-  public getGame(tournamentId: string) {
+  public getTournament(tournamentId: string) {
     return this._activeTournament.get(tournamentId);
+  }
+
+  public removeTournament(tournamentId: string) {
+    this._activeTournament.delete(tournamentId);
   }
 
   public getCurrRoundInfo(tournamentId: string) {

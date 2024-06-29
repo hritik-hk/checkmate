@@ -61,6 +61,7 @@ model Tournament {
   participants    String[]
   status          Status
   gameType        GameType
+  createdAt       DateTime         @default(now())
   TournamentGames TournamentGame[]
   Rounds          Round[]
 }

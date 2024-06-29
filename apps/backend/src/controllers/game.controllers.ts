@@ -163,9 +163,7 @@ export const getGamesHistory = async (req: IRequest, res: Response) => {
       },
     });
 
-    const gamesHistory = [...games, ...tournamentGames];
-
-    //to do: sort gameHistory acc to data in decending order
+    let gamesHistory = [...games, ...tournamentGames];
 
     return res.status(200).json(gamesHistory);
   } catch (err) {

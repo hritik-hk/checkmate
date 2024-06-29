@@ -89,7 +89,7 @@ class GameState {
     winnerId: string | null;
   }) {
     try {
-      //TO DO: handle "DRAW"
+      //TO DO: handle "DRAW" CASE
 
       emitSocketEvent(this._gameId, GameEvent.END_GAME, {
         result,

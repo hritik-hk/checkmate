@@ -2,7 +2,9 @@ import { IRound } from "../interfaces/common.js";
 import { emitSocketEvent } from "../index.js";
 import { TournamentEvent, GameEvent, GameCategory } from "../constants.js";
 import { Queue } from "@datastructures-js/queue";
-import { gamesHandler } from "../index.js";
+import { gamesHandler, tournamentHandler } from "../index.js";
+import db from "../configs/database.js";
+import { Status } from "@prisma/client";
 
 class Tournament {
   private _tournamentId: string;
@@ -57,6 +59,35 @@ class Tournament {
     }, delay);
   }
 
+  private async _endTournament() {
+    try {
+      //update tournament status
+      await db.tournament.update({
+        where: {
+          id: this._tournamentId,
+        },
+        data: {
+          status: Status.COMPLETED,
+        },
+      });
+
+      //clear all timeouts
+      if (this._currRoundStart) {
+        clearTimeout(this._currRoundStart);
+      }
+
+      //send tournament end
+      emitSocketEvent(this._tournamentId, TournamentEvent.END_TOURNAMENT, {
+        msg: "tournament ended successfully",
+      });
+
+      //remove from active tournament
+      tournamentHandler.removeTournament(this._tournamentId);
+    } catch (err) {
+      console.log("error occurred while update tournament status: ", err);
+    }
+  }
+
   //reset currRoundEnd
   private _resetRoundEnd() {
     if (this._currRoundEnd) {
@@ -65,10 +96,13 @@ class Tournament {
 
     this._rounds.dequeue();
 
-    this._resetRoundStart();
+    //check if all rounds are done
+    if (this._rounds.isEmpty()) {
+      this._endTournament();
+      return;
+    }
 
-    //To-Do: make updates in database
-    // To-DO: remove from active tournaments when tournament Ends
+    this._resetRoundStart();
 
     const currRound = this._rounds.front();
     const delay = Number(currRound?.endTime) - Date.now();

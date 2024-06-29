@@ -78,15 +78,22 @@ export default function Tournament() {
     console.log("end>now", Number(currRoundInfo.endTime) > Date.now());
   }
 
+  function handleTournamentEnd() {
+    setStatus("completed");
+    setcurrRoundInfo(null); // to trigger points table update
+  }
+
   //setup socket event listeners
   useEffect(() => {
     if (!socket) return;
 
     socket.on(TournamentEvent.ROUND_UPDATE, handleRoundUpdate);
+    socket.on(TournamentEvent.END_TOURNAMENT, handleTournamentEnd);
     socket.emit(TournamentEvent.JOIN_TOURNAMENT, tournamentId);
 
     return () => {
       socket.off(TournamentEvent.ROUND_UPDATE, handleRoundUpdate);
+      socket.off(TournamentEvent.END_TOURNAMENT, handleTournamentEnd);
     };
   }, []);
 
@@ -202,7 +209,7 @@ export default function Tournament() {
           </div>
 
           <div className="p-5 flex justify-center items-center">
-            {currRoundInfo && (
+            {currRoundInfo && status !== "completed" && (
               <div className="text-3xl">
                 {status === "start" ? (
                   <div>{`Round: ${currRoundInfo.roundNumber} starts in `}</div>
@@ -211,6 +218,9 @@ export default function Tournament() {
                 )}
                 {countdown && <CountDown seconds={countdown} />}
               </div>
+            )}
+            {status === "completed" && (
+              <div className="text-3xl font-medium">TOURNAMENT ENDED</div>
             )}
           </div>
         </div>

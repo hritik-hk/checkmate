@@ -52,8 +52,13 @@ export default function Home() {
     }
 
     async function fetchGamesHistory(username: string) {
-      const data = await getGamesHistory(username);
-      setGamesHistory(data);
+      const gamesHistory = await getGamesHistory(username);
+      //sorting games acc to latest datetime
+      gamesHistory.sort(
+        (a: any, b: any) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setGamesHistory(gamesHistory);
     }
 
     async function fetchTournamentHistory(username: string) {

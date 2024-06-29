@@ -296,6 +296,9 @@ export const getTournamentHistory = async (req: IRequest, res: Response) => {
           has: user.id,
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     return res.status(200).json(tournamentHistory);

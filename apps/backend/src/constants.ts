@@ -22,6 +22,7 @@ export const TournamentEvent = {
   START_TOURNAMENT: "START_TOURNAMENT",
   JOIN_TOURNAMENT: "JOIN_TOURNAMENT",
   ROUND_UPDATE: "ROUND_UPDATE",
+  END_TOURNAMENT: "END_TOURNAMENT",
 } as const;
 
 export const FriendEvent = {

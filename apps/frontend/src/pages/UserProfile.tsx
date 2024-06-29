@@ -8,7 +8,7 @@ import clock from "../assets/clock.svg";
 import avatar from "../assets/avatar.svg";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { user } from "@/interfaces/common";
+import { IUser } from "@/interfaces/common";
 import { getUserByUsername } from "@/api/user";
 import { useSocket } from "@/hooks/socket";
 import { FriendEvent } from "@/utils/constant";
@@ -21,7 +21,7 @@ export default function UserProfile() {
   const { socket } = useSocket();
   const { username } = useParams();
 
-  const [userInfo, setUserInfo] = useState<user | null>(null);
+  const [userInfo, setUserInfo] = useState<IUser | null>(null);
   const [gamesHistory, setGamesHistory] = useState<any>(null);
   const [sentRequestsInfo, setSentRequestsInfo] = useState<any>(null);
   const [receivedRequestsInfo, setReceivedRequestsInfo] = useState<any>(null);

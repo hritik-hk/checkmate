@@ -199,10 +199,7 @@ export default function Board({
 
       <Chessboard
         position={gameState.fen()}
-        arePremovesAllowed={true}
-        autoPromoteToQueen={true}
         boardOrientation={boardOrientation}
-        clearPremovesOnRightClick={true}
         onPieceDrop={onDrop}
       />
       <div className="flex justify-between mt-3 bg-neutral-900 rounded-md p-3">
