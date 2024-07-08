@@ -23,7 +23,7 @@ export default function ActionCenter({ friendRequests }: any) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className="bg-white text-black p-2 rounded-lg">Actions</button>
+        <button className="bg-white text-black p-1 md:p-2  rounded-lg">Actions</button>
       </PopoverTrigger>
       <PopoverContent className="w-64 bg-stone-900">
         {friendRequests.length > 0 ? (
@@ -51,7 +51,7 @@ export default function ActionCenter({ friendRequests }: any) {
             })}
           </div>
         ) : (
-          <div className="text-2xl">No Friend Requests...</div>
+          <div className="text-lg md:text-2xl">No Friend Requests...</div>
         )}
       </PopoverContent>
     </Popover>

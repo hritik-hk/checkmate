@@ -9,6 +9,7 @@ import { getUserByUsername } from "@/api/user";
 import ActionCenter from "./ActionCenter";
 import { useAuth } from "@/hooks/auth";
 import { getFriendRequests } from "@/api/user";
+import { LuLogOut } from "react-icons/lu";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -46,7 +47,9 @@ export default function Navbar() {
       <nav className="bg-stone-900 text-white">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-2">
           <div>
-            <img src={checkmateLogo} className="h-16" alt="checkmate Logo" />
+            <Link to="/">
+              <img src={checkmateLogo} className="h-16" alt="checkmate Logo" />
+            </Link>
           </div>
           <div className="w-full md:block md:w-auto">
             <div className=" flex items-center font-medium rounded-lg">
@@ -63,7 +66,7 @@ export default function Navbar() {
                   </Button>
                 </div>
               </div>
-              <div className="mx-4 bg-white text-black p-2 rounded-md">
+              <div className="hidden sm:block mx-4 bg-white text-black p-2 rounded-md">
                 <Link to="/" className=" py-2 px-3rounded">
                   Home
                 </Link>
@@ -73,9 +76,14 @@ export default function Navbar() {
                 <ActionCenter friendRequests={requests} />
               </div>
 
-              <div className="bg-white text-black p-2 rounded-md">
-                <Link to="/logout" className=" py-2 px-3 rounded">
+              <div className="hidden sm:block bg-white text-black p-2  rounded-md">
+                <Link to="/logout" className="py-2 px-3 rounded">
                   Logout
+                </Link>
+              </div>
+              <div className="sm:hidden bg-white text-black p-2 rounded-md">
+                <Link to="/logout">
+                  <LuLogOut />
                 </Link>
               </div>
             </div>

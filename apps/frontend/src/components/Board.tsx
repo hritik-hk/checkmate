@@ -200,8 +200,10 @@ export default function Board({
       <Chessboard
         position={gameState.fen()}
         boardOrientation={boardOrientation}
+        autoPromoteToQueen={true}
         onPieceDrop={onDrop}
       />
+
       <div className="flex justify-between mt-3 bg-neutral-900 rounded-md p-3">
         <div className="text-xl font-sans font-semibold">
           {myInfo.username}

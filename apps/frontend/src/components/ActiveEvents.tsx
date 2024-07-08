@@ -13,16 +13,16 @@ export function ActiveEvents({ gamesHistory, tournamentHistory }: any) {
         </TabsTrigger>
       </TabsList>
       <TabsContent value="Games">
-        <div className="min-h-36 bg-stone-800">
-          <p className="text-xl py-4">No ongoing games...</p>
+        <div className="min-h-20 h-md:min-h-36 bg-stone-800">
+          <p className="text-xl p-4">No ongoing games...</p>
         </div>
         <div className="mt-5">
           <GameHistory gamesHistory={gamesHistory} />
         </div>
       </TabsContent>
       <TabsContent value="Tournaments">
-        <div className="min-h-36 bg-stone-800">
-          <p className="text-xl py-4">No ongoing Tournaments...</p>
+        <div className="min-h-20 md:min-h-36 bg-stone-800">
+          <p className="text-xl p-4">No ongoing Tournaments...</p>
         </div>
       </TabsContent>
     </Tabs>

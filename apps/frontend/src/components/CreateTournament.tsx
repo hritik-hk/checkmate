@@ -107,9 +107,9 @@ export function CreateTournament({ userFriends }: { userFriends: IFriend[] }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="w-3/4  text-2xl text-white bg-stone-800 hover:bg-neutral-600 font-md tracking-wide rounded-lg px-10 py-10">
+        <Button className="w-3/4 text-lg md:text-2xl text-white bg-stone-800 hover:bg-neutral-600 font-md tracking-wide rounded-lg p-7 md:p-10">
           <span className="mr-3">
-            <img className="w-14" src={tournament} alt="" />
+            <img className="w-10 md:w-14 max-w-fit" src={tournament} alt="tournament" />
           </span>
           Create Tournament
         </Button>

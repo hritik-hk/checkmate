@@ -20,8 +20,8 @@ export function GameHistory({ gamesHistory }: any) {
         <Table className="bg-stone-900">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Type</TableHead>
-              <TableHead>Players</TableHead>
+              <TableHead className="w-12 md:w-[100px]">Type</TableHead>
+              <TableHead >Players</TableHead>
               <TableHead className="w-[70px]">Result</TableHead>
               <TableHead>Date</TableHead>
             </TableRow>
@@ -29,17 +29,17 @@ export function GameHistory({ gamesHistory }: any) {
           <TableBody>
             {gamesHistory.map((game: any, index: number) => (
               <TableRow key={index}>
-                <TableCell className="font-medium">{game.gameType}</TableCell>
+                <TableCell className="text-xs md:text-base md:font-medium">{game.gameType}</TableCell>
                 <TableCell>
                   <div>
                     <div>
-                      <span className="w-3 h-3 bg-slate-200 mr-3 inline-block"></span>
-                      <p className="inline-block text-base tracking-wide font-medium">
+                      <span className="w-3 h-3 bg-slate-200 mr-2 md:mr-3 inline-block"></span>
+                      <p className="inline-block md:text-base tracking-wide md:font-medium">
                         {game.whitePlayer.username}
                       </p>
                     </div>
-                    <span className="h-3 w-3 bg-stone-500 mr-3 inline-block"></span>
-                    <p className="inline-block text-base tracking-wide font-medium">
+                    <span className="h-3 w-3 bg-stone-500 mr-2 md:mr-3 inline-block"></span>
+                    <p className="inline-block md:text-base tracking-wide md:font-medium">
                       {game.blackPlayer.username}
                     </p>
                   </div>
@@ -59,7 +59,7 @@ export function GameHistory({ gamesHistory }: any) {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="text-xs md:text-base">
                   {" "}
                   {new Date(game.createdAt).toLocaleDateString("en-US", {
                     year: "numeric",

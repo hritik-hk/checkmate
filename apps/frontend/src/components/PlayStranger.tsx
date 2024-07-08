@@ -42,9 +42,9 @@ export default function PlayStranger({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="w-3/4 text-2xl text-white bg-stone-800 hover:bg-neutral-600 font-md tracking-wide rounded-lg px-10 py-10">
+        <Button className="w-3/4 text-lg md:text-2xl text-white bg-stone-800 hover:bg-neutral-600 font-md tracking-wide rounded-lg p-7 md:p-10">
           <span className="mr-3">
-            <img className="w-20" src={stranger} alt="" />
+            <img className="w-12 md:w-20 max-w-fit" src={stranger} alt="stranger" />
           </span>
           Play with Stranger
         </Button>
