@@ -43,7 +43,7 @@ export default function Login() {
       <div className="h-screen w-screen relative">
         <div className="absolute h-full w-full bg-login bg-center blur-sm bg-cover"></div>
         <div className="w-full h-full flex justify-center items-center">
-          <div className="w-1/4 p-6 text-white space-y-4 md:space-y-6 sm:p-8 z-10">
+          <div className="md:w-1/4 p-6 text-white space-y-4 md:space-y-6 sm:p-8 z-10">
             <h1 className="text-2xl text-center font-bold leading-tight tracking-tigh">
               Sign in to your account
             </h1>

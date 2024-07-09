@@ -48,7 +48,7 @@ export default function Navbar() {
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-2">
           <div>
             <Link to="/">
-              <img src={checkmateLogo} className="h-16" alt="checkmate Logo" />
+              <img src={checkmateLogo} className="h-12 sm:h-16" alt="checkmate Logo" />
             </Link>
           </div>
           <div className="w-full md:block md:w-auto">

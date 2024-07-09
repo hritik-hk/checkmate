@@ -1,21 +1,14 @@
 import CountDown from "@/components/CountDown";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
 import Navbar from "@/components/Navbar";
 import { useEffect, useState, useRef } from "react";
-import { Separator } from "@radix-ui/react-separator";
 import { points, fixtureRow, roundInterface } from "@/interfaces/common";
 import { getPointsTable, getFixture } from "@/api/tournament";
 import { useParams } from "react-router-dom";
 import { useSocket } from "@/hooks/socket";
 import { TournamentEvent } from "@/utils/constant";
+import PointsTable from "@/components/PointsTable";
+import TournamentFixture from "@/components/TournamentFixture";
+import TournamentCompactView from "@/components/TournamentCompactView";
 
 export default function Tournament() {
   const { tournamentId } = useParams();
@@ -131,96 +124,54 @@ export default function Tournament() {
     <>
       <Navbar />
       {fixture && pointsTable && (
-        <div>
-          <div className="px-48 bg-stone-700 h-3/4">
-            <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2">
-              <div>
+        <div className="bg-stone-700 min-h-screen">
+          <div>
+            <div className="px-48 h-3/4">
+              <div className="hidden sm:grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2">
                 {/* points table */}
-
                 <div>
                   <h2 className="text-3xl font-semibold tracking-wide font-mono bg-stone-900 my-2 rounded-md p-3">
                     POINTS TABLE
                   </h2>
-                  <Table className="bg-stone-900">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[100px]">Position</TableHead>
-                        <TableHead>Player</TableHead>
-                        <TableHead>Points</TableHead>
-                        <TableHead>Rating</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {pointsTable.map((player, index) => (
-                        <TableRow key={index}>
-                          <TableCell className="font-bold">
-                            {`#${player.position}`}
-                          </TableCell>
-                          <TableCell>{player.player_username}</TableCell>
-                          <TableCell>{player.point}</TableCell>
-                          <TableCell>{player.rating}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                  <PointsTable pointsTable={pointsTable} />
                 </div>
-                {/* ongoing games in tournament */}
+                {/* Tournament Fixture */}
                 <div>
-                  <h2 className="text-2xl font-semibold tracking-wide font-mono bg-stone-900 mt-5 mb-3 rounded-md p-3">
-                    Ongoing Tournament Games
+                  <h2 className="text-3xl font-semibold tracking-wide font-mono bg-stone-900 my-2 rounded-md p-3">
+                    Tournament Fixture
                   </h2>
-                  <div className="min-h-36 bg-stone-800">
-                    <p className="text-xl py-4">No ongoing games...</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tournament Fixture */}
-              <div>
-                <h2 className="text-3xl font-semibold tracking-wide font-mono bg-stone-900 my-2 rounded-md p-3">
-                  Tournament Fixture
-                </h2>
-                <div className="bg-stone-800 p-4 rounded-md">
-                  {fixture.map((round) => {
-                    return (
-                      <div>
-                        <h3 className="text-2xl font-semibold tracking-wide font-mono">
-                          ROUND {round.round}
-                        </h3>
-                        <Separator className="mb-2 text-slate-200 h-1" />
-                        {round.games.map((game) => {
-                          return (
-                            <div>
-                              <div className="flex">
-                                <p className="w-2/5">{game.player1_username}</p>
-                                <p className="w-1/5">VS</p>
-                                <p className="w-2/5">{game.player2_username}</p>
-                              </div>
-                              <Separator className="mb-2" />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
+                  <TournamentFixture fixture={fixture} />
                 </div>
               </div>
             </div>
+
+            <div className="sm:hidden pt-5">
+              <TournamentCompactView
+                pointsTable={pointsTable}
+                fixture={fixture}
+              />
+            </div>
           </div>
 
-          <div className="p-5 flex justify-center items-center">
+          <div className="py-1 sm:py-5 flex justify-center items-center">
             {currRoundInfo && status !== "completed" && (
-              <div className="text-3xl">
+              <div className="text-xl sm:text-3xl font-mono mt-10 bg-stone-900 py-4 px-2 sm:px-4 rounded-md">
                 {status === "start" ? (
-                  <div>{`Round: ${currRoundInfo.roundNumber} starts in `}</div>
+                  <span>{`Round-${currRoundInfo.roundNumber} starts in: `}</span>
                 ) : (
-                  <div>{`Round: ${currRoundInfo.roundNumber} ends in `}</div>
+                  <span>{`Round-${currRoundInfo.roundNumber} ends in: `}</span>
                 )}
-                {countdown && <CountDown seconds={countdown} />}
+                {countdown && (
+                  <span className="bg-red-700 p-2 rounded-lg">
+                    <CountDown seconds={countdown} />
+                  </span>
+                )}
               </div>
             )}
             {status === "completed" && (
-              <div className="text-3xl font-medium">TOURNAMENT ENDED</div>
+              <div className="mt-4 sm:mt-7 text-2xl sm:text-3xl font-medium bg-red-700 p-2 rounded-lg">
+                TOURNAMENT ENDED
+              </div>
             )}
           </div>
         </div>

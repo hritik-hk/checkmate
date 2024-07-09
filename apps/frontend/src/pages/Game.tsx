@@ -89,7 +89,7 @@ export default function Game() {
         myCountDown &&
         opponentCountDown && (
           <div className="flex justify-center bg-stone-700 h-screen py-5">
-            <div className="w-screen sm:w-2/5">
+            <div className="w-screen sm:w-[550px]">
               <Board
                 gameId={currGameInfo?.gameId}
                 gameState={gameState}

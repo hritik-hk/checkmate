@@ -94,7 +94,7 @@ export default function Home() {
                     <p className="text-2xl md:text-4xl tracking-wide font-medium">
                       {userInfo?.username}
                     </p>
-                    <p className="text-xs md:text-md">
+                    <p className="text-xs md:text-base">
                       Joined{" "}
                       {new Date(userInfo.createdAt).toLocaleDateString(
                         "en-US",

@@ -15,7 +15,7 @@ export default function AppRoutes() {
         path="/"
         element={
           <Protected>
-            <Home />,
+            <Home />
           </Protected>
         }
       />

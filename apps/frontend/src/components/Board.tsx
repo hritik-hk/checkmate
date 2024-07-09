@@ -194,7 +194,11 @@ export default function Board({
               : `(${opponentInfo.blitz_rating})`}
           </span>
         </div>
-        {opponentCountDown && <CountDown seconds={opponentCountDown} />}
+        {opponentCountDown && (
+          <span className="py-1 px-5 bg-stone-700 rounded-md">
+            <CountDown seconds={opponentCountDown} />
+          </span>
+        )}
       </div>
 
       <Chessboard
@@ -213,7 +217,11 @@ export default function Board({
               : `(${myInfo.blitz_rating})`}
           </span>
         </div>
-        {myCountDown && <CountDown seconds={myCountDown} />}
+        {myCountDown && (
+          <span className="py-1 px-5 bg-stone-700 rounded-md">
+            <CountDown seconds={myCountDown} />
+          </span>
+        )}
       </div>
     </div>
   );

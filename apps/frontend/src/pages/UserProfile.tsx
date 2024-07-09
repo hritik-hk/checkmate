@@ -148,20 +148,20 @@ export default function UserProfile() {
     <>
       <Navbar />
       {authUser && userInfo && gamesHistory && (
-        <div className=" w-100 min-h-[1200px] bg-stone-700 pt-10 px-64">
+        <div className="min-h-[1200px] bg-stone-700 pt-10 px-6 md:px-64">
           <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
             <div className="col-span-2">
-              <div className="bg-stone-800 text-white p-4 rounded-md">
+              <div className="bg-stone-800 w-fit md:w-full  text-white p-2 md:p-4 rounded-md">
                 <div className="flex">
                   <div>
-                    <img className="w-56" src={avatar} alt="" />
+                    <img className="w-28 md:w-56" src={avatar} alt="avatar" />
                   </div>
                   <div>
                     <div>
-                      <p className="text-4xl tracking-wide font-medium">
+                      <p className="text-2xl md:text-4xl tracking-wide font-medium">
                         {userInfo.username}
                       </p>
-                      <p>
+                      <p className="text-xs md:text-base">
                         Joined{" "}
                         {new Date(userInfo.createdAt).toLocaleDateString(
                           "en-US",
@@ -174,31 +174,23 @@ export default function UserProfile() {
                       </p>
                     </div>
                     <div className="mt-4">
-                      <p className="m-1">
-                        <span className="m-1">
-                          <img
-                            className="w-8 inline-block"
-                            src={blitz}
-                            alt=""
-                          />
-                        </span>
-                        <span className="text-xl tracking-wide font-medium">
-                          Blitz rating: {userInfo.blitz_rating}
-                        </span>
-                      </p>
-                      <p className="m-1">
-                        <span className="mr-1">
-                          <img
-                            className="w-10 inline-block"
-                            src={clock}
-                            alt=""
-                          />
-                        </span>
-                        <span className="text-xl tracking-wide font-medium">
-                          Rapid rating: {userInfo.rapid_rating}
-                        </span>
-                      </p>
-                    </div>
+                    <p className="m-1">
+                      <span className="m-1">
+                        <img className="w-4 md:w-8 inline-block" src={blitz} alt="" />
+                      </span>
+                      <span className="text-sm md:text-xl tracking-wide font-medium">
+                        Blitz rating: {userInfo.blitz_rating}
+                      </span>
+                    </p>
+                    <p className="m-1">
+                      <span className="mr-1">
+                        <img className="w-6 md:w-10 inline-block" src={clock} alt="" />
+                      </span>
+                      <span className="text-sm md:text-xl tracking-wide font-medium">
+                        Rapid rating: {userInfo.rapid_rating}
+                      </span>
+                    </p>
+                  </div>
                     {userInfo.id !== authUser.id && (
                       <div>
                         {friend ? (
@@ -243,7 +235,7 @@ export default function UserProfile() {
                   </TabsContent>
                   <TabsContent value="Tournaments">
                     <div className="mt-5">
-                      <GameHistory gamesHistory={gamesHistory} />
+                      {/* <GameHistory gamesHistory={gamesHistory} /> */}
                     </div>
                   </TabsContent>
                 </Tabs>
