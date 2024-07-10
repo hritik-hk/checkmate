@@ -171,3 +171,44 @@ export const getGamesHistory = async (req: IRequest, res: Response) => {
     return res.status(500).json({ error: err });
   }
 };
+
+export const getOnGoingGame = async (req: IRequest, res: Response) => {
+  try {
+    const userId = req.body.userId;
+
+    const game = await db.game.findFirst({
+      where: {
+        OR: [
+          {
+            whitePlayerId: userId,
+            status: Status.IN_PROGRESS,
+          },
+          {
+            blackPlayerId: userId,
+            status: Status.IN_PROGRESS,
+          },
+        ],
+      },
+      select: {
+        id: true,
+        status: true,
+        whitePlayer: {
+          select: {
+            username: true,
+          },
+        },
+        blackPlayer: {
+          select: {
+            username: true,
+          },
+        },
+        gameType: true,
+      },
+    });
+
+    return res.status(200).json({ gameInfo: game });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err });
+  }
+};

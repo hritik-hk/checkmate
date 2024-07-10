@@ -10,9 +10,9 @@ import avatar from "../assets/avatar.svg";
 import PlayStranger from "@/components/PlayStranger";
 import { useEffect, useState } from "react";
 import { getUserByUsername } from "@/api/user";
-import { getGamesHistory } from "@/api/game";
+import { getGamesHistory, getOnGoingGame } from "@/api/game";
 import { getTournamentHistory } from "@/api/tournament";
-import { IUser } from "@/interfaces/common";
+import { GameInfo, IUser } from "@/interfaces/common";
 import Connecting from "@/components/Connecting";
 
 export default function Home() {
@@ -22,6 +22,7 @@ export default function Home() {
   const [gamesHistory, setGamesHistory] = useState<any>(null);
   const [tournamentHistory, setTournamentHistory] = useState<any>(null);
   const [connecting, setConnecting] = useState<boolean>(false);
+  const [onGoingGame, SetOnGoingGame] = useState<GameInfo | null>(null);
 
   function getTotalBlitzGames() {
     let count = 0;
@@ -66,6 +67,11 @@ export default function Home() {
       setTournamentHistory(data);
     }
 
+    async function fetchOnGoingGame(userId: string) {
+      const data = await getOnGoingGame(userId);
+      SetOnGoingGame(data.gameInfo);
+    }
+
     // load userInfo
     if (authUser) {
       // load stats
@@ -73,6 +79,7 @@ export default function Home() {
       //load tournament played
       //load friends
       fetchUserInfo(authUser.username);
+      fetchOnGoingGame(authUser.id);
       fetchGamesHistory(authUser.username);
       fetchTournamentHistory(authUser.username);
     }
@@ -109,7 +116,11 @@ export default function Home() {
                   <div className="mt-4">
                     <p className="m-1">
                       <span className="m-1">
-                        <img className="w-4 md:w-8 inline-block" src={blitz} alt="" />
+                        <img
+                          className="w-4 md:w-8 inline-block"
+                          src={blitz}
+                          alt=""
+                        />
                       </span>
                       <span className="text-sm md:text-xl tracking-wide font-medium">
                         Blitz rating: {userInfo.blitz_rating}
@@ -117,7 +128,11 @@ export default function Home() {
                     </p>
                     <p className="m-1">
                       <span className="mr-1">
-                        <img className="w-6 md:w-10 inline-block" src={clock} alt="" />
+                        <img
+                          className="w-6 md:w-10 inline-block"
+                          src={clock}
+                          alt=""
+                        />
                       </span>
                       <span className="text-sm md:text-xl tracking-wide font-medium">
                         Rapid rating: {userInfo.rapid_rating}
@@ -143,6 +158,7 @@ export default function Home() {
                 <div className="col-span-2">
                   <ActiveEvents
                     gamesHistory={gamesHistory}
+                    onGoingGame={onGoingGame}
                     tournamentHistory={tournamentHistory}
                   />
                 </div>

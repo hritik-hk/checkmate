@@ -66,3 +66,26 @@ export const getGamesHistory = async (username: string) => {
     return null;
   }
 };
+
+export const getOnGoingGame = async (userId: string) => {
+  try {
+    const resp = await fetch(getUrl(`game/ongoing`), {
+      credentials: "include",
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+
+    console.log(resp);
+
+    if (!resp.ok) {
+      throw new Error("user not found");
+    }
+
+    const gameInfo = await resp.json();
+    return gameInfo;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};

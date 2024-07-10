@@ -84,6 +84,17 @@ export interface GameContextInterface {
   setOpponentCountDown: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
+export interface GameInfo {
+  id: string;
+  whitePlayer: {
+    username: string;
+  };
+  blackPlayer: {
+    username: string;
+  };
+  gameType: string;
+}
+
 export interface points {
   position: number;
   player_username: string;

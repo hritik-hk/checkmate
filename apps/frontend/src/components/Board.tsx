@@ -94,6 +94,7 @@ export default function Board({
     };
   }, [socket]);
 
+  //for handling both game init and refresh
   useEffect(() => {
     if (gameState.turn() === "w" && whitePlayerId === myInfo.id) {
       startMyTimer();
