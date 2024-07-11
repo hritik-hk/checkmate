@@ -13,8 +13,6 @@ export const createTournament = async (req: IRequest, res: Response) => {
     const gameType = req.body?.gameType;
     const gameDuration = req.body.gameDuration;
 
-    console.log("creating tournamen of type: ", gameType);
-
     if (participants.length < 3) {
       return res
         .status(400)
@@ -38,13 +36,25 @@ export const createTournament = async (req: IRequest, res: Response) => {
     }
 
     const playerIds = users.map((player) => player.id);
+    const totalTournaments = await db.tournament.count();
+    const currTournamentNum = totalTournaments + 1;
 
     const newTournament = await db.tournament.create({
       data: {
-        participants: playerIds,
+        name: "Checkmate Clash #" + currTournamentNum.toString(),
         gameType: gameType,
         status: Status.IN_PROGRESS,
       },
+    });
+
+    const tournamentParticipant = playerIds.map((player) => ({
+      userId: player,
+      tournamentId: newTournament.id,
+    }));
+
+    //create tournament participants
+    await db.tournamentParticipant.createMany({
+      data: tournamentParticipant,
     });
 
     //create all tournament games - round robin format
@@ -94,7 +104,11 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
         id: tournamentId,
       },
       select: {
-        participants: true,
+        participants: {
+          select: {
+            userId: true,
+          },
+        },
         gameType: true,
       },
     });
@@ -111,7 +125,7 @@ export const getPointsTable = async (req: IRequest, res: Response) => {
     if (!tournament) return res.status(400).json({ msg: "invalid tournament" });
 
     for (let i = 0; i < tournament.participants.length; i++) {
-      const player = tournament.participants[i] as string;
+      const player = tournament.participants[i]?.userId as string;
       const games = await db.tournamentGame.findMany({
         where: {
           OR: [
@@ -270,40 +284,6 @@ export const getFixture = async (req: IRequest, res: Response) => {
     return res.status(200).json(fixture);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: err });
-  }
-};
-
-export const getTournamentHistory = async (req: IRequest, res: Response) => {
-  try {
-    const username = req.body.username;
-
-    //fetch user
-    const user = await db.user.findFirst({
-      where: {
-        username: username,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    if (user === null) return res.status(400).json({ msg: "invalid user" });
-
-    const tournamentHistory = await db.tournament.findMany({
-      where: {
-        participants: {
-          has: user.id,
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    return res.status(200).json(tournamentHistory);
-  } catch (err) {
-    console.log("error at getTournamentHistory controller: ", err);
     return res.status(500).json({ error: err });
   }
 };

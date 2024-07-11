@@ -16,20 +16,21 @@ datasource db {
 // TO DO: Add indexing
 
 model User {
-  id                     String           @id @default(uuid())
-  email                  String           @unique
-  username               String           @unique
-  blitz_rating           Int              @default(800)
-  rapid_rating           Int              @default(800)
+  id                     String                  @id @default(uuid())
+  email                  String                  @unique
+  username               String                  @unique
+  blitz_rating           Int                     @default(800)
+  rapid_rating           Int                     @default(800)
   password_salt          String
   password_hash          String
-  createdAt              DateTime         @default(now())
-  friends                User[]           @relation("friends")
-  friendOf               User[]           @relation("friends")
-  gamesAsWhite           Game[]           @relation("GamesAsWhite")
-  gamesAsBlack           Game[]           @relation("GamesAsBlack")
-  TournamentGamesAsWhite TournamentGame[] @relation("TournamentGamesAsWhite")
-  TournamentGamesAsBlack TournamentGame[] @relation("TournamentGamesAsBlack")
+  createdAt              DateTime                @default(now())
+  friends                User[]                  @relation("friends")
+  friendOf               User[]                  @relation("friends")
+  gamesAsWhite           Game[]                  @relation("GamesAsWhite")
+  gamesAsBlack           Game[]                  @relation("GamesAsBlack")
+  TournamentGamesAsWhite TournamentGame[]        @relation("TournamentGamesAsWhite")
+  TournamentGamesAsBlack TournamentGame[]        @relation("TournamentGamesAsBlack")
+  Tournaments            TournamentParticipant[]
 }
 
 model FriendRequest {
@@ -57,13 +58,24 @@ model Game {
 }
 
 model Tournament {
-  id              String           @id @default(uuid())
-  participants    String[]
+  id              String                  @id @default(uuid())
+  name            String
+  // participants    String[]
   status          Status
   gameType        GameType
-  createdAt       DateTime         @default(now())
+  createdAt       DateTime                @default(now())
   TournamentGames TournamentGame[]
   Rounds          Round[]
+  participants    TournamentParticipant[]
+}
+
+model TournamentParticipant {
+  userId       String
+  tournamentId String
+  user         User       @relation(fields: [userId], references: [id])
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+
+  @@id([userId, tournamentId])
 }
 
 model TournamentGame {
