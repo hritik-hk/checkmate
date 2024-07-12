@@ -15,6 +15,8 @@ import { FriendEvent } from "@/utils/constant";
 import { createFriendRequest } from "@/api/user";
 import { getGamesHistory } from "@/api/game";
 import { getSentRequests, getFriendRequests } from "@/api/user";
+import TournamentsHistory from "@/components/TournamentsHistory";
+import { getTournamentHistory } from "@/api/tournament";
 
 export default function UserProfile() {
   const { authUser } = useAuth();
@@ -28,6 +30,7 @@ export default function UserProfile() {
   const [requestSent, setRequestSent] = useState(false);
   const [requestReceived, setRequestReceived] = useState(false);
   const [friend, setFriend] = useState(false);
+  const [tournamentHistory, setTournamentHistory] = useState<any>(null);
 
   function getTotalBlitzGames() {
     let count = 0;
@@ -90,6 +93,17 @@ export default function UserProfile() {
       fetchGamesHistory(username);
     }
   }, [username]);
+
+  useEffect(() => {
+    async function fetchTournamentHistory(userId: string) {
+      const data = await getTournamentHistory(userId);
+      setTournamentHistory(data);
+    }
+
+    if (userInfo) {
+      fetchTournamentHistory(userInfo.id);
+    }
+  }, [userInfo]);
 
   useEffect(() => {
     async function fetchSentRequests() {
@@ -174,23 +188,31 @@ export default function UserProfile() {
                       </p>
                     </div>
                     <div className="mt-4">
-                    <p className="m-1">
-                      <span className="m-1">
-                        <img className="w-4 md:w-8 inline-block" src={blitz} alt="" />
-                      </span>
-                      <span className="text-sm md:text-xl tracking-wide font-medium">
-                        Blitz rating: {userInfo.blitz_rating}
-                      </span>
-                    </p>
-                    <p className="m-1">
-                      <span className="mr-1">
-                        <img className="w-6 md:w-10 inline-block" src={clock} alt="" />
-                      </span>
-                      <span className="text-sm md:text-xl tracking-wide font-medium">
-                        Rapid rating: {userInfo.rapid_rating}
-                      </span>
-                    </p>
-                  </div>
+                      <p className="m-1">
+                        <span className="m-1">
+                          <img
+                            className="w-4 md:w-8 inline-block"
+                            src={blitz}
+                            alt=""
+                          />
+                        </span>
+                        <span className="text-sm md:text-xl tracking-wide font-medium">
+                          Blitz rating: {userInfo.blitz_rating}
+                        </span>
+                      </p>
+                      <p className="m-1">
+                        <span className="mr-1">
+                          <img
+                            className="w-6 md:w-10 inline-block"
+                            src={clock}
+                            alt=""
+                          />
+                        </span>
+                        <span className="text-sm md:text-xl tracking-wide font-medium">
+                          Rapid rating: {userInfo.rapid_rating}
+                        </span>
+                      </p>
+                    </div>
                     {userInfo.id !== authUser.id && (
                       <div>
                         {friend ? (
@@ -235,7 +257,9 @@ export default function UserProfile() {
                   </TabsContent>
                   <TabsContent value="Tournaments">
                     <div className="mt-5">
-                      {/* <GameHistory gamesHistory={gamesHistory} /> */}
+                      <TournamentsHistory
+                        tournamentHistory={tournamentHistory}
+                      />
                     </div>
                   </TabsContent>
                 </Tabs>
