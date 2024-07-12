@@ -95,6 +95,15 @@ export interface GameInfo {
   gameType: string;
 }
 
+export interface TournamentInfo {
+  tournament: {
+    id: string;
+    name: string;
+    gameType: string;
+    status: string;
+  };
+}
+
 export interface points {
   position: number;
   player_username: string;

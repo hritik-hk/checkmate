@@ -16,12 +16,12 @@ export function GameHistory({ gamesHistory }: any) {
 
   return (
     <>
-      {authUser && gamesHistory && (
+      {authUser && gamesHistory && gamesHistory.length > 0 && (
         <Table className="bg-stone-900">
           <TableHeader>
             <TableRow>
               <TableHead className="w-12 md:w-[100px]">Type</TableHead>
-              <TableHead >Players</TableHead>
+              <TableHead>Players</TableHead>
               <TableHead className="w-[70px]">Result</TableHead>
               <TableHead>Date</TableHead>
             </TableRow>
@@ -29,7 +29,9 @@ export function GameHistory({ gamesHistory }: any) {
           <TableBody>
             {gamesHistory.map((game: any, index: number) => (
               <TableRow key={index}>
-                <TableCell className="text-xs md:text-base md:font-medium">{game.gameType}</TableCell>
+                <TableCell className="text-xs md:text-base md:font-medium">
+                  {game.gameType}
+                </TableCell>
                 <TableCell>
                   <div>
                     <div>

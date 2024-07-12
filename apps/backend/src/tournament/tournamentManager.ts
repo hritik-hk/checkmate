@@ -45,7 +45,7 @@ class tournamentManager {
   public getCurrRoundInfo(tournamentId: string) {
     const tournament = this._activeTournament.get(tournamentId);
     if (!tournament) {
-      console.log("invalid tournament id");
+      console.log("invalid tournament id at tournament manager");
       return;
     }
     return tournament.getCurrRoundInfo();

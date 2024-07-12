@@ -10,8 +10,6 @@ export const createGame = async (data: any) => {
       body: JSON.stringify(data),
     });
 
-    console.log(resp);
-
     if (!resp.ok) {
       throw new Error("user not found");
     }
@@ -48,7 +46,7 @@ export const startRandomGame = async (data: {
 
 export const getGamesHistory = async (username: string) => {
   try {
-    const resp = await fetch(getUrl("game/history"), {
+    const resp = await fetch(getUrl("user/game_history"), {
       credentials: "include",
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -69,17 +67,15 @@ export const getGamesHistory = async (username: string) => {
 
 export const getOnGoingGame = async (userId: string) => {
   try {
-    const resp = await fetch(getUrl(`game/ongoing`), {
+    const resp = await fetch(getUrl(`user/ongoing_game`), {
       credentials: "include",
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ userId }),
     });
 
-    console.log(resp);
-
     if (!resp.ok) {
-      throw new Error("user not found");
+      throw new Error("error fetching on going games");
     }
 
     const gameInfo = await resp.json();

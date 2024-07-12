@@ -6,11 +6,17 @@ import TournamentFixture from "./TournamentFixture";
 interface TournamentCompactView {
   fixture: fixtureRow[];
   pointsTable: points[];
+  tournamentId: string;
+  roundId: string;
+  status: string;
 }
 
 export default function TournamentCompactView({
   fixture,
   pointsTable,
+  tournamentId,
+  roundId,
+  status,
 }: TournamentCompactView) {
   return (
     <Tabs defaultValue="PointsTable">
@@ -27,7 +33,12 @@ export default function TournamentCompactView({
         </TabsTrigger>
       </TabsList>
       <TabsContent value="PointsTable">
-        <PointsTable pointsTable={pointsTable} />
+        <PointsTable
+          pointsTable={pointsTable}
+          tournamentId={tournamentId}
+          roundId={roundId}
+          status={status}
+        />
       </TabsContent>
       <TabsContent value="TournamentFixture">
         <TournamentFixture fixture={fixture} />

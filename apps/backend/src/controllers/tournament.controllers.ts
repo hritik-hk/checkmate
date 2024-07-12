@@ -287,3 +287,44 @@ export const getFixture = async (req: IRequest, res: Response) => {
     return res.status(500).json({ error: err });
   }
 };
+
+export const getOngoingTournamentGames = async (
+  req: IRequest,
+  res: Response
+) => {
+  try {
+    const tournamentId = req.body.tournamentId;
+    const roundId = req.body.roundId;
+
+    const tournamentGames = await db.tournamentGame.findMany({
+      where: {
+        tournamentId: tournamentId,
+        roundId: roundId,
+        status: Status.IN_PROGRESS,
+      },
+      select: {
+        id: true,
+        status: true,
+        whitePlayer: {
+          select: {
+            username: true,
+          },
+        },
+        blackPlayer: {
+          select: {
+            username: true,
+          },
+        },
+        gameType: true,
+      },
+    });
+
+    return res.status(200).json(tournamentGames);
+  } catch (err) {
+    console.log(
+      `error fetching on-going tournament: ${req.body.tournamentId} games`,
+      err
+    );
+    return res.status(500).json(err);
+  }
+};

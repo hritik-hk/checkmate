@@ -11,8 +11,8 @@ import PlayStranger from "@/components/PlayStranger";
 import { useEffect, useState } from "react";
 import { getUserByUsername } from "@/api/user";
 import { getGamesHistory, getOnGoingGame } from "@/api/game";
-import { getTournamentHistory } from "@/api/tournament";
-import { GameInfo, IUser } from "@/interfaces/common";
+import { getTournamentHistory, getOnGoingTournament } from "@/api/tournament";
+import { GameInfo, IUser, TournamentInfo } from "@/interfaces/common";
 import Connecting from "@/components/Connecting";
 
 export default function Home() {
@@ -22,7 +22,10 @@ export default function Home() {
   const [gamesHistory, setGamesHistory] = useState<any>(null);
   const [tournamentHistory, setTournamentHistory] = useState<any>(null);
   const [connecting, setConnecting] = useState<boolean>(false);
-  const [onGoingGame, SetOnGoingGame] = useState<GameInfo | null>(null);
+  const [onGoingGame, setOnGoingGame] = useState<GameInfo | null>(null);
+  const [onGoingTournament, setOnGoingTournament] = useState<TournamentInfo[]>(
+    []
+  );
 
   function getTotalBlitzGames() {
     let count = 0;
@@ -62,14 +65,19 @@ export default function Home() {
       setGamesHistory(gamesHistory);
     }
 
-    async function fetchTournamentHistory(username: string) {
-      const data = await getTournamentHistory(username);
+    async function fetchTournamentHistory(userId: string) {
+      const data = await getTournamentHistory(userId);
       setTournamentHistory(data);
     }
 
     async function fetchOnGoingGame(userId: string) {
       const data = await getOnGoingGame(userId);
-      SetOnGoingGame(data.gameInfo);
+      setOnGoingGame(data.gameInfo);
+    }
+
+    async function fetchOnGoingTournament(userId: string) {
+      const data = await getOnGoingTournament(userId);
+      setOnGoingTournament(data);
     }
 
     // load userInfo
@@ -81,7 +89,8 @@ export default function Home() {
       fetchUserInfo(authUser.username);
       fetchOnGoingGame(authUser.id);
       fetchGamesHistory(authUser.username);
-      fetchTournamentHistory(authUser.username);
+      fetchTournamentHistory(authUser.id);
+      fetchOnGoingTournament(authUser.id);
     }
   }, [authUser]);
 
@@ -160,6 +169,7 @@ export default function Home() {
                     gamesHistory={gamesHistory}
                     onGoingGame={onGoingGame}
                     tournamentHistory={tournamentHistory}
+                    onGoingTournament={onGoingTournament}
                   />
                 </div>
                 <div>

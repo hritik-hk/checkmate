@@ -44,13 +44,13 @@ export const getFixture = async (tournamentId: string) => {
   }
 };
 
-export const getTournamentHistory = async (username: string) => {
+export const getTournamentHistory = async (userId: string) => {
   try {
-    const resp = await fetch(getUrl("tournament/history"), {
+    const resp = await fetch(getUrl("user/tournament_history"), {
       credentials: "include",
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ username }),
+      body: JSON.stringify({ userId }),
     });
 
     if (!resp.ok) {
@@ -90,6 +90,51 @@ export const createTournament = async ({
     return data;
   } catch (err) {
     console.log(err);
+    return null;
+  }
+};
+
+export const getOnGoingTournament = async (userId: string) => {
+  try {
+    const resp = await fetch(getUrl(`user/ongoing_tournament`), {
+      credentials: "include",
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+
+    if (!resp.ok) {
+      throw new Error("error fetching ongoing tournaments");
+    }
+
+    const tournamentInfo = await resp.json();
+    return tournamentInfo;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+export const getOnGoingTournamentGames = async (
+  tournamentId: string,
+  roundId: string
+) => {
+  try {
+    const resp = await fetch(getUrl(`tournament/ongoing_games`), {
+      credentials: "include",
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ tournamentId, roundId }),
+    });
+
+    if (!resp.ok) {
+      throw new Error("error fetching ongoing tournament games");
+    }
+
+    const tournamentGames = await resp.json();
+    return tournamentGames;
+  } catch (err) {
+    console.error(err);
     return null;
   }
 };

@@ -123,7 +123,7 @@ export default function Tournament() {
   return (
     <>
       <Navbar />
-      {fixture && pointsTable && (
+      {fixture && pointsTable && currRoundInfo && (
         <div className="bg-stone-700 min-h-screen">
           <div>
             <div className="px-48 h-3/4">
@@ -133,7 +133,12 @@ export default function Tournament() {
                   <h2 className="text-3xl font-semibold tracking-wide font-mono bg-stone-900 my-2 rounded-md p-3">
                     POINTS TABLE
                   </h2>
-                  <PointsTable pointsTable={pointsTable} />
+                  <PointsTable
+                    pointsTable={pointsTable}
+                    tournamentId={currRoundInfo.tournamentId}
+                    roundId={currRoundInfo.id}
+                    status={status}
+                  />
                 </div>
                 {/* Tournament Fixture */}
                 <div>
@@ -149,6 +154,9 @@ export default function Tournament() {
               <TournamentCompactView
                 pointsTable={pointsTable}
                 fixture={fixture}
+                tournamentId={currRoundInfo.tournamentId}
+                roundId={currRoundInfo.id}
+                status={status}
               />
             </div>
           </div>
