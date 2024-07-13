@@ -9,6 +9,7 @@ import { TournamentEvent } from "@/utils/constant";
 import PointsTable from "@/components/PointsTable";
 import TournamentFixture from "@/components/TournamentFixture";
 import TournamentCompactView from "@/components/TournamentCompactView";
+import Spinner from "@/components/Spinner";
 
 export default function Tournament() {
   const { tournamentId } = useParams();
@@ -119,6 +120,15 @@ export default function Tournament() {
   useEffect(() => {
     resetCountdown();
   }, [status, currRoundInfo]);
+
+  if (!currRoundInfo && !fixture && !pointsTable) {
+    return (
+      <>
+        <Navbar />
+        <Spinner />
+      </>
+    );
+  }
 
   return (
     <>

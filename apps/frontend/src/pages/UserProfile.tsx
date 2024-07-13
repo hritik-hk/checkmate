@@ -17,6 +17,7 @@ import { getGamesHistory } from "@/api/game";
 import { getSentRequests, getFriendRequests } from "@/api/user";
 import TournamentsHistory from "@/components/TournamentsHistory";
 import { getTournamentHistory } from "@/api/tournament";
+import Spinner from "@/components/Spinner";
 
 export default function UserProfile() {
   const { authUser } = useAuth();
@@ -158,10 +159,19 @@ export default function UserProfile() {
     }
   }, [sentRequestsInfo, receivedRequestsInfo, userInfo]);
 
+  if (!authUser && !userInfo) {
+    return (
+      <>
+        <Navbar />
+        <Spinner />
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
-      {authUser && userInfo && gamesHistory && (
+      {authUser && userInfo && gamesHistory && tournamentHistory && (
         <div className="min-h-[1200px] bg-stone-700 pt-10 px-6 md:px-64">
           <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-3">
             <div className="col-span-2">

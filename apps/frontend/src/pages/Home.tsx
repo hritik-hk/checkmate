@@ -14,6 +14,7 @@ import { getGamesHistory, getOnGoingGame } from "@/api/game";
 import { getTournamentHistory, getOnGoingTournament } from "@/api/tournament";
 import { GameInfo, IUser, TournamentInfo } from "@/interfaces/common";
 import Connecting from "@/components/Connecting";
+import Spinner from "@/components/Spinner";
 
 export default function Home() {
   const { authUser } = useAuth();
@@ -93,6 +94,15 @@ export default function Home() {
       fetchOnGoingTournament(authUser.id);
     }
   }, [authUser]);
+
+  if (!authUser && !userInfo) {
+    return (
+      <>
+        <Navbar />
+        <Spinner />
+      </>
+    );
+  }
 
   return (
     <>
