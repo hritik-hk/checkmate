@@ -52,7 +52,7 @@ const loginUser = async (req: IRequest, res: Response) => {
       }); //issue token
 
       const cookieOptions = {
-        httpOnly: true,
+        httpOnly: process.env.NODE_ENV === "development" ? true : false,
         maxAge: expires,
       };
 
@@ -84,12 +84,13 @@ const checkAuth = async (req: IRequest, res: Response) => {
 };
 
 const logout = async (req: IRequest, res: Response) => {
+  const cookieOptions = {
+    httpOnly: process.env.NODE_ENV === "development" ? true : false,
+    maxAge: 0,
+  };
   res
     .status(200)
-    .cookie("accessToken", "", {
-      maxAge: 0,
-      httpOnly: true,
-    })
+    .cookie("accessToken", "", cookieOptions)
     .json({ msg: "successfully loggedout" });
 };
 
