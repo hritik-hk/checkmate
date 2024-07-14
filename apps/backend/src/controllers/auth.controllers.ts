@@ -51,10 +51,18 @@ const loginUser = async (req: IRequest, res: Response) => {
         id: user.id,
       }); //issue token
 
-      const cookieOptions = {
-        httpOnly: process.env.NODE_ENV === "development" ? true : false,
-        maxAge: expires,
-      };
+      const cookieOptions =
+        process.env.NODE_ENV === "development"
+          ? {
+              httpOnly: true,
+              maxAge: expires,
+            }
+          : {
+              httpOnly: true,
+              maxAge: expires,
+              secure: true,
+              sameSite: "none" as "none",
+            };
 
       res
         .status(200)
@@ -84,10 +92,19 @@ const checkAuth = async (req: IRequest, res: Response) => {
 };
 
 const logout = async (req: IRequest, res: Response) => {
-  const cookieOptions = {
-    httpOnly: process.env.NODE_ENV === "development" ? true : false,
-    maxAge: 0,
-  };
+  const cookieOptions =
+    process.env.NODE_ENV === "development"
+      ? {
+          httpOnly: true,
+          maxAge: 0,
+        }
+      : {
+          httpOnly: true,
+          maxAge: 0,
+          secure: true,
+          sameSite: "none" as "none",
+        };
+
   res
     .status(200)
     .cookie("accessToken", "", cookieOptions)
