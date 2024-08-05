@@ -51,7 +51,6 @@ model Game {
   gameType      GameType
   gameDuration  Int
   winnerId      String?
-  moves         String[] //for now let it be strings
   createdAt     DateTime    @default(now())
   whitePlayer   User        @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
   blackPlayer   User        @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
@@ -60,7 +59,6 @@ model Game {
 model Tournament {
   id              String                  @id @default(uuid())
   name            String
-  // participants    String[]
   status          Status
   gameType        GameType
   createdAt       DateTime                @default(now())
@@ -88,7 +86,6 @@ model TournamentGame {
   gameType      GameType
   gameDuration  Int
   winnerId      String?
-  moves         String[] //for now let it be strings
   roundId       String
   createdAt     DateTime    @default(now())
   tournament    Tournament  @relation(fields: [tournamentId], references: [id])

@@ -41,7 +41,6 @@ export interface IGame {
   gameType: GameType;
   gameDuration: number;
   winnerId: string | null;
-  moves: string[];
 }
 
 export interface ITournamentGame {
@@ -54,7 +53,6 @@ export interface ITournamentGame {
   gameType: GameType;
   gameDuration: number;
   winnerId: string | null;
-  moves: string[];
   roundId: string;
 }
 

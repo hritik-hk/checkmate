@@ -124,7 +124,6 @@ export default function Tournament() {
   if (!currRoundInfo && !fixture && !pointsTable) {
     return (
       <>
-        <Navbar />
         <Spinner />
       </>
     );

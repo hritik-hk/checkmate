@@ -46,7 +46,15 @@ export default class SocketService {
   private mountJoinGameEvent(socket: ISocket) {
     socket.on(GameEvent.JOIN_GAME, async (gameId: string) => {
       const gameInfo = await gamesHandler.getGameInfo(gameId);
-      socket.emit(GameEvent.JOIN_GAME, gameInfo);
+
+      //check if the socket has already joined the room
+      const alreadyJoined = socket.rooms.has(gameId);
+      if (!alreadyJoined) {
+        socket.join(gameId);
+      }
+      if (gameInfo) {
+        socket.emit(GameEvent.JOIN_GAME, gameInfo);
+      }
     });
   }
 

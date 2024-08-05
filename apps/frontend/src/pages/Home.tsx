@@ -98,7 +98,6 @@ export default function Home() {
   if (!authUser && !userInfo) {
     return (
       <>
-        <Navbar />
         <Spinner />
       </>
     );

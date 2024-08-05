@@ -108,7 +108,7 @@ const logout = async (req: IRequest, res: Response) => {
   res
     .status(200)
     .cookie("accessToken", "", cookieOptions)
-    .json({ msg: "successfully loggedout" });
+    .json({ msg: "successfully logged out" });
 };
 
 export { createUser, loginUser, checkAuth, logout };

@@ -1,7 +1,6 @@
 import { GameState } from "./game.js";
 import { IGame, ITournamentGame } from "../interfaces/common.js";
 import db from "../configs/database.js";
-import { GameType } from "@prisma/client";
 
 class gameManager {
   private activeGames: Map<string, GameState>; //will contain currently active games
@@ -32,8 +31,10 @@ class gameManager {
   }
 
   public async getGameInfo(gameId: string) {
-    const game = this.activeGames.get(gameId);
+    //check if game exists
+    if (!this.activeGames.has(gameId)) return null;
 
+    const game = this.activeGames.get(gameId);
     const whitePlayer = await db.user.findFirst({
       where: {
         id: game?.whitePlayer,
