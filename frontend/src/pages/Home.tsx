@@ -8,6 +8,7 @@ import { ActiveEvents } from "@/components/ActiveEvents";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import avatar from "../assets/avatar.svg";
 import PlayStranger from "@/components/PlayStranger";
+import PlayBot from "@/components/PlayBot";
 import { useEffect, useState } from "react";
 import { getUserByUsername } from "@/api/user";
 import { getGamesHistory, getOnGoingGame } from "@/api/game";
@@ -166,6 +167,9 @@ export default function Home() {
               </div>
               <div className="my-3">
                 <PlayStranger setConnecting={setConnecting} />
+              </div>
+              <div className="my-3">
+                <PlayBot />
               </div>
               <CreateTournament userFriends={userInfo.friends} />
             </div>
