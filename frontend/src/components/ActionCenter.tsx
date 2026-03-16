@@ -51,7 +51,7 @@ export default function ActionCenter({ friendRequests }: any) {
             })}
           </div>
         ) : (
-          <div className="text-lg md:text-2xl">No Friend Requests...</div>
+          <div className="text-lg">No Friend Requests...</div>
         )}
       </PopoverContent>
     </Popover>
