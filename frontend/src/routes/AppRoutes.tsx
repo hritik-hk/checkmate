@@ -7,6 +7,7 @@ import Game from "../pages/Game";
 import Tournament from "@/pages/Tournament";
 import UserProfile from "@/pages/UserProfile";
 import Logout from "@/components/Logout";
+import BotGame from "@/pages/BotGame";
 
 export default function AppRoutes() {
   return (
@@ -31,6 +32,15 @@ export default function AppRoutes() {
 
       <Route path="/login" element={<Login />} />
       <Route path="/logout" element={<Logout />} />
+
+      <Route
+        path="/bot"
+        element={
+          <Protected>
+            <BotGame />
+          </Protected>
+        }
+      />
       <Route
         path="/tournament/:tournamentId"
         element={

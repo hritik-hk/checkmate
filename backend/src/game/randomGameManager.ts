@@ -6,127 +6,71 @@ import { GameCategory, GameEvent } from "../constants.js";
 import { GameType, Status } from "@prisma/client";
 import { gamesHandler } from "../index.js";
 
-const compareBlitz: ICompare<IUser> = (user1: IUser, user2: IUser) => {
-  // with highest rating
-  return user1.blitz_rating > user2.blitz_rating ? -1 : 1;
-};
+const compareBlitz: ICompare<IUser> = (a, b) =>
+  a.blitz_rating > b.blitz_rating ? -1 : 1; // highest rating
 
-const compareRapid: ICompare<IUser> = (user1: IUser, user2: IUser) => {
-  // with highest rating
-  return user1.rapid_rating > user2.rapid_rating ? -1 : 1;
-};
+const compareRapid: ICompare<IUser> = (a, b) =>
+  a.rapid_rating > b.rapid_rating ? -1 : 1; // highest rating
 
 class randomGameManager {
-  private _blitzQueue: PriorityQueue<IUser>; // 5min games
-  private _rapidQueue: PriorityQueue<IUser>; // 10min games
-  private _activeWaiting: Set<string>; // users who have not cancelled play request
+  private _queues: Record<GameType, PriorityQueue<IUser>>;
+  private _activeWaiting: Set<string>; // players who have not cancelled their request.
 
   constructor() {
-    this._blitzQueue = new PriorityQueue<IUser>(compareBlitz);
-    this._rapidQueue = new PriorityQueue<IUser>(compareRapid);
+    this._queues = {
+      [GameType.BLITZ]: new PriorityQueue<IUser>(compareBlitz),
+      [GameType.RAPID]: new PriorityQueue<IUser>(compareRapid),
+    };
     this._activeWaiting = new Set<string>();
   }
 
-  private async handleAssignBlitzGame(req: IRequest) {
-    while (this._blitzQueue.size() > 1) {
-      const whitePlayer = this._blitzQueue.dequeue();
-      const blackPlayer = this._blitzQueue.dequeue();
+  private async handleAssignGame(req: IRequest, gameType: GameType) {
+    const queue = this._queues[gameType];
 
-      // deleting players who have cancelled their game request
-      if (
-        !this._activeWaiting.has(whitePlayer.id) &&
-        !this._activeWaiting.has(blackPlayer.id)
-      ) {
-        continue;
-      } else if (!this._activeWaiting.has(whitePlayer.id)) {
-        this._blitzQueue.enqueue(blackPlayer);
-        continue;
-      } else if (!this._activeWaiting.has(blackPlayer.id)) {
-        this._blitzQueue.enqueue(whitePlayer);
+    while (queue.size() > 1) {
+      const player1 = queue.dequeue();
+      if (!player1) continue; // ts fix
+
+      const player2 = queue.dequeue();
+      
+      if (!player2) { // ts fix
+        queue.enqueue(player1);
         continue;
       }
 
-      //create new game
+      const p1Active = this._activeWaiting.has(player1.id);
+      const p2Active = this._activeWaiting.has(player2.id);
+
+      // put back whichever active player lost their match due to the other cancelling
+      if (!p1Active) {
+        if (p2Active) queue.enqueue(player2);
+        continue;
+      }
+      if (!p2Active) {
+        queue.enqueue(player1);
+        continue;
+      }
+
       try {
         const newGame = await db.game.create({
           data: {
-            whitePlayerId: whitePlayer.id,
-            blackPlayerId: blackPlayer.id,
+            whitePlayerId: player1.id,
+            blackPlayerId: player2.id,
             status: Status.IN_PROGRESS,
             gameType: req.body.gameType,
             gameDuration: req.body.gameDuration,
           },
         });
 
-        //add to active games
         gamesHandler.addGame(newGame, GameCategory.NORMAL_GAME);
 
-        // emit start_game socket event to both players
-        emitSocketEvent(newGame.blackPlayerId, GameEvent.INIT_GAME, newGame.id);
-
-        emitSocketEvent(newGame.whitePlayerId, GameEvent.INIT_GAME, newGame.id);
-
-        //removing players from active waiting
-        this._activeWaiting.delete(blackPlayer.id);
-        this._activeWaiting.delete(whitePlayer.id);
+        emitSocketEvent(player1.id, GameEvent.INIT_GAME, newGame.id);
+        emitSocketEvent(player2.id, GameEvent.INIT_GAME, newGame.id);
       } catch (err) {
-        console.log(err);
-
-        //removing players from active waiting
-        this._activeWaiting.delete(blackPlayer.id);
-        this._activeWaiting.delete(whitePlayer.id);
-      }
-    }
-  }
-
-  private async handleAssignRapidGame(req: IRequest) {
-    while (this._rapidQueue.size() > 1) {
-      const whitePlayer = this._rapidQueue.dequeue();
-      const blackPlayer = this._rapidQueue.dequeue();
-
-      // deleting players who have cancelled their game request
-      if (
-        !this._activeWaiting.has(whitePlayer.id) &&
-        !this._activeWaiting.has(blackPlayer.id)
-      ) {
-        continue;
-      } else if (!this._activeWaiting.has(whitePlayer.id)) {
-        this._rapidQueue.enqueue(blackPlayer);
-        continue;
-      } else if (!this._activeWaiting.has(blackPlayer.id)) {
-        this._rapidQueue.enqueue(whitePlayer);
-        continue;
-      }
-
-      //create new game
-      try {
-        const newGame = await db.game.create({
-          data: {
-            whitePlayerId: whitePlayer.id,
-            blackPlayerId: blackPlayer.id,
-            status: Status.IN_PROGRESS,
-            gameType: req.body.gameType,
-            gameDuration: req.body.gameDuration,
-          },
-        });
-
-        //add to active games
-        gamesHandler.addGame(newGame, GameCategory.NORMAL_GAME);
-
-        // emit start_game socket event to both players
-        emitSocketEvent(newGame.blackPlayerId, GameEvent.INIT_GAME, newGame.id);
-
-        emitSocketEvent(newGame.whitePlayerId, GameEvent.INIT_GAME, newGame.id);
-
-        //removing players from active waiting
-        this._activeWaiting.delete(blackPlayer.id);
-        this._activeWaiting.delete(whitePlayer.id);
-      } catch (err) {
-        console.log(err);
-
-        //removing players from active waiting
-        this._activeWaiting.delete(blackPlayer.id);
-        this._activeWaiting.delete(whitePlayer.id);
+        console.error("Failed to create game:", err);
+      } finally {
+        this._activeWaiting.delete(player1.id);
+        this._activeWaiting.delete(player2.id);
       }
     }
   }
@@ -136,21 +80,14 @@ class randomGameManager {
   }
 
   public async addPlayer(req: IRequest, user: IUser) {
-    //handling multiple requests by same user
-    if (this._activeWaiting.has(user.id)) {
-      return;
-    }
+    if(!user) return;
+    if (this._activeWaiting.has(user.id)) return;
 
-    // add to player, to active waiting
     this._activeWaiting.add(user.id);
 
-    if (req.body.gameType === GameType.BLITZ) {
-      this._blitzQueue.enqueue(user);
-      await this.handleAssignBlitzGame(req);
-    } else {
-      this._rapidQueue.enqueue(user);
-      await this.handleAssignRapidGame(req);
-    }
+    const gameType = req.body.gameType as GameType;
+    this._queues[gameType].enqueue(user);
+    await this.handleAssignGame(req, gameType);
   }
 }
 

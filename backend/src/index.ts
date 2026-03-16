@@ -35,6 +35,10 @@ const emitSocketEvent = (roomId: string, event: string, payload: any) => {
   socketServer.io.in(roomId).emit(event, payload);
 };
 
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.use("/api/auth", authRouter);
 app.use("/api/user", isAuth, userRouter);
 app.use("/api/game", isAuth, gameRouter);

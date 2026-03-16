@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "./hooks/auth";
 import { getUrl } from "./utils/helpers";
 import { useSocket } from "./hooks/socket";
@@ -6,6 +6,7 @@ import { FriendEvent, GameEvent, TournamentEvent } from "./utils/constant";
 import { createGame } from "./api/game";
 import { useNavigate } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
+import ServerWakeUp from "./components/ServerWakeUp";
 import { useGame } from "./hooks/game";
 import { gameInfoInterface } from "./interfaces/common";
 import { Chess } from "chess.js";
@@ -14,6 +15,8 @@ import { declineFriendRequest, addFriendship } from "./api/user";
 import { useTournament } from "./hooks/tournament";
 
 function App() {
+  const [serverReady, setServerReady] = useState(false);
+  const handleServerReady = useCallback(() => setServerReady(true), []);
   const { isLoggedIn, setIsLoggedIn, setAuthUser, authUser } = useAuth();
   const { socket } = useSocket();
   const navigate = useNavigate();
@@ -186,6 +189,7 @@ function App() {
 
   return (
     <>
+      {!serverReady && <ServerWakeUp onReady={handleServerReady} />}
       <AppRoutes />
     </>
   );

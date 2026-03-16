@@ -43,7 +43,8 @@ class Tournament {
     }
 
     const currRound = this._rounds.front();
-    const delay = Number(currRound?.startTime) - Date.now();
+    if (!currRound) return; // typescript fix
+    const delay = Number(currRound.startTime) - Date.now();
 
     this._currRoundStart = setTimeout(() => {
       //initiate all round games
