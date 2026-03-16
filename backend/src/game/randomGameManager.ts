@@ -29,7 +29,14 @@ class randomGameManager {
 
     while (queue.size() > 1) {
       const player1 = queue.dequeue();
+      if (!player1) continue; // ts fix
+
       const player2 = queue.dequeue();
+      
+      if (!player2) { // ts fix
+        queue.enqueue(player1);
+        continue;
+      }
 
       const p1Active = this._activeWaiting.has(player1.id);
       const p2Active = this._activeWaiting.has(player2.id);
@@ -73,6 +80,7 @@ class randomGameManager {
   }
 
   public async addPlayer(req: IRequest, user: IUser) {
+    if(!user) return;
     if (this._activeWaiting.has(user.id)) return;
 
     this._activeWaiting.add(user.id);
